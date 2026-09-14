@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>UNiFY File Host</title>
+
+<style>
+*{
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
+}
+
+body{
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+  font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  background:
+    radial-gradient(circle at top,#182033 0,#0b0e14 45%,#07090d 100%);
+  color:#fff;
+}
+
+.card{
+  width:min(720px,100%);
+  padding:28px;
+  border:1px solid rgba(255,255,255,.09);
+  border-radius:28px;
+  background:rgba(18,22,31,.82);
+  backdrop-filter:blur(24px);
+  box-shadow:0 30px 80px rgba(0,0,0,.45);
+}
+
+.header{
+  margin-bottom:24px;
+}
+
+.header h1{
+  font-size:28px;
+  font-weight:800;
+  letter-spacing:-.7px;
+}
+
+.header p{
+  margin-top:7px;
+  color:#8e98aa;
+  font-size:14px;
+}
+
+.drop{
+  width:100%;
+  min-height:220px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border:2px dashed #3d4657;
+  border-radius:22px;
+  padding:30px 20px;
+  text-align:center;
+  cursor:pointer;
+  transition:.2s ease;
+  overflow:hidden;
+}
+
+.drop:hover,
+.drop.drag{
+  border-color:#7c8cff;
+  background:rgba(124,140,255,.07);
+}
+
+.drop-content{
+  width:100%;
+}
+
+.icon{
+  font-size:44px;
+  margin-bottom:10px;
+}
+
+.pick{
+  display:block;
+  color:#fff;
+  font-size:16px;
+  font-weight:700;
+  word-break:break-word;
+}
+
+.hint{
+  margin-top:7px;
+  color:#7f899b;
+  font-size:13px;
+}
+
+input[type=file]{
+  display:none;
+}
+
+.selected{
+  display:none;
+  margin-top:18px;
+  padding:14px 16px;
+  border-radius:16px;
+  background:#151a24;
+  border:1px solid #252d3b;
+}
+
+.selected.show{
+  display:block;
+}
+
+.file-name{
+  font-size:14px;
+  font-weight:700;
+  word-break:break-word;
+}
+
+.file-size{
+  margin-top:4px;
+  color:#7f899b;
+  font-size:12px;
+}
+
+.progress-box{
+  display:none;
+  margin-top:18px;
+}
+
+.progress-box.show{
+  display:block;
+}
+
+.progress-info{
+  display:flex;
+  justify-content:space-between;
+  margin-bottom:8px;
+  color:#929caf;
+  font-size:12px;
+}
+
+.progress{
+  width:100%;
+  height:9px;
+  overflow:hidden;
+  border-radius:99px;
+  background:#202632;
+}
+
+.bar{
+  width:0%;
+  height:100%;
+  border-radius:99px;
+  background:linear-gradient(90deg,#6c63ff,#00e676);
+  transition:width .15s linear;
+}
+
+button{
+  width:100%;
+  margin-top:18px;
+  min-height:52px;
+  border:0;
+  border-radius:16px;
+  background:linear-gradient(135deg,#6c63ff,#00c853);
+  color:white;
+  font-size:15px;
+  font-weight:800;
+  cursor:pointer;
+}
+
+button:disabled{
+  opacity:.45;
+  cursor:not-allowed;
+}
+
+.error{
+  display:none;
+  margin-top:15px;
+  padding:13px 15px;
+  border-radius:14px;
+  background:rgba(255,70,70,.09);
+  border:1px solid rgba(255,70,70,.25);
+  color:#ff9d9d;
+  font-size:13px;
+}
+
+.error.show{
+  display:block;
+}
+
+.result{
+  display:none;
+  margin-top:18px;
+  padding:16px;
+  border-radius:18px;
+  background:rgba(0,230,118,.06);
+  border:1px solid rgba(0,230,118,.2);
+}
+
+.result.show{
+  display:block;
+}
+
+.result-title{
+  font-weight:800;
+  margin-bottom:10px;
+}
+
+.url{
+  padding:12px;
+  border-radius:12px;
+  background:#0b0e14;
+  color:#9fffc7;
+  font-size:12px;
+  line-height:1.5;
+  word-break:break-all;
+}
+
+.copy{
+  margin-top:10px;
+  background:#202735;
+}
+
+.footer{
+  margin-top:20px;
+  text-align:center;
+  color:#606a7c;
+  font-size:11px;
+}
+
+@media(max-width:520px){
+  body{
+    padding:12px;
+  }
+
+  .card{
+    padding:20px;
+    border-radius:22px;
+  }
+
+  .header h1{
+    font-size:24px;
+  }
+
+  .drop{
+    min-height:190px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<main class="card">
+
+  <div class="header">
+    <h1>UNiFY File Host</h1>
+    <p>Upload files securely to Cloudflare R2</p>
+  </div>
+
+  <label class="drop" id="drop">
+    <input id="fileInput" type="file">
+
+    <div class="drop-content">
+      <div class="icon">☁️</div>
+      <span class="pick" id="pickText">
+        Click or drag a file here
+      </span>
+      <div class="hint">
+        Images · Videos · Audio · ZIP · PDF · Code · Max 500 MB
+      </div>
+    </div>
+  </label>
+
+  <div class="selected" id="selected">
+    <div class="file-name" id="fileName"></div>
+    <div class="file-size" id="fileSize"></div>
+  </div>
+
+  <div class="progress-box" id="progressBox">
+    <div class="progress-info">
+      <span>Uploading...</span>
+      <span id="percent">0%</span>
+    </div>
+
+    <div class="progress">
+      <div class="bar" id="bar"></div>
+    </div>
+  </div>
+
+  <button id="uploadBtn" disabled>
+    Upload File
+  </button>
+
+  <div class="error" id="error"></div>
+
+  <div class="result" id="result">
+    <div class="result-title">Upload Complete ✓</div>
+
+    <div class="url" id="url"></div>
+
+    <button class="copy" id="copyBtn">
+      Copy Public URL
+    </button>
+  </div>
+
+  <div class="footer">
+    Powered by UNiFY CODE · Cloudflare R2
+  </div>
+
+</main>
+
+<script>
+const fileInput = document.getElementById("fileInput");
+const drop = document.getElementById("drop");
+const pickText = document.getElementById("pickText");
+const selected = document.getElementById("selected");
+const fileName = document.getElementById("fileName");
+const fileSize = document.getElementById("fileSize");
+const uploadBtn = document.getElementById("uploadBtn");
+const progressBox = document.getElementById("progressBox");
+const bar = document.getElementById("bar");
+const percent = document.getElementById("percent");
+const errorBox = document.getElementById("error");
+const result = document.getElementById("result");
+const url = document.getElementById("url");
+const copyBtn = document.getElementById("copyBtn");
+
+const MAX_SIZE = 500 * 1024 * 1024;
+
+let selectedFile = null;
+
+function formatSize(bytes){
+  if(bytes < 1024) return bytes + " B";
+
+  const units = ["KB","MB","GB"];
+  let size = bytes / 1024;
+  let i = 0;
+
+  while(size >= 1024 && i < units.length - 1){
+    size /= 1024;
+    i++;
+  }
+
+  return size.toFixed(size >= 100 ? 0 : 2) + " " + units[i];
+}
+
+function showError(message){
+  errorBox.textContent = message;
+  errorBox.classList.add("show");
+}
+
+function clearMessages(){
+  errorBox.classList.remove("show");
+  result.classList.remove("show");
+}
+
+function selectFile(file){
+  clearMessages();
+
+  if(!file){
+    return;
+  }
+
+  if(file.size > MAX_SIZE){
+    selectedFile = null;
+    uploadBtn.disabled = true;
+    showError("Maximum file size is 500 MB.");
+    return;
+  }
+
+  selectedFile = file;
+
+  fileName.textContent = file.name;
+  fileSize.textContent = formatSize(file.size);
+
+  selected.classList.add("show");
+  uploadBtn.disabled = false;
+  pickText.textContent = file.name;
+}
+
+fileInput.addEventListener("change", () => {
+  selectFile(fileInput.files[0]);
+});
+
+drop.addEventListener("dragover", event => {
+  event.preventDefault();
+  drop.classList.add("drag");
+});
+
+drop.addEventListener("dragleave", () => {
+  drop.classList.remove("drag");
+});
+
+drop.addEventListener("drop", event => {
+  event.preventDefault();
+  drop.classList.remove("drag");
+
+  const file = event.dataTransfer.files[0];
+
+  if(file){
+    selectFile(file);
+  }
+});
+
+uploadBtn.addEventListener("click", async () => {
+  if(!selectedFile) return;
+
+  clearMessages();
+
+  uploadBtn.disabled = true;
+  progressBox.classList.add("show");
+
+  bar.style.width = "0%";
+  percent.textContent = "0%";
+
+  try{
+
+    const response = await fetch("/api/upload-url", {
+      method:"POST",
+      headers:{
+        "Content-Type":"application/json"
+      },
+      body:JSON.stringify({
+        fileName:selectedFile.name,
+        contentType:selectedFile.type || "application/octet-stream",
+        fileSize:selectedFile.size
+      })
+    });
+
+    const data = await response.json();
+
+    if(!response.ok){
+      throw new Error(data.error || "Could not create upload URL.");
+    }
+
+    await uploadToR2(data.uploadUrl);
+
+    bar.style.width = "100%";
+    percent.textContent = "100%";
+
+    url.textContent = data.publicUrl;
+    result.classList.add("show");
+
+  }catch(error){
+
+    console.error(error);
+    showError(error.message || "Upload failed.");
+
+  }finally{
+
+    uploadBtn.disabled = false;
+
+  }
+});
+
+function uploadToR2(uploadUrl){
+
+  return new Promise((resolve,reject)=>{
+
+    const xhr = new XMLHttpRequest();
+
+    xhr.open("PUT", uploadUrl);
+
+    xhr.setRequestHeader(
+      "Content-Type",
+      selectedFile.type || "application/octet-stream"
+    );
+
+    xhr.upload.addEventListener("progress", event => {
+
+      if(event.lengthComputable){
+
+        const value = Math.round(
+          (event.loaded / event.total) * 100
+        );
+
+        bar.style.width = value + "%";
+        percent.textContent = value + "%";
+
+      }
+
+    });
+
+    xhr.addEventListener("load", () => {
+
+      if(xhr.status >= 200 && xhr.status < 300){
+        resolve();
+      }else{
+        reject(
+          new Error(
+            "R2 upload failed. Check R2 CORS settings."
+          )
+        );
+      }
+
+    });
+
+    xhr.addEventListener("error", () => {
+      reject(
+        new Error(
+          "Network error during R2 upload."
+        )
+      );
+    });
+
+    xhr.addEventListener("abort", () => {
+      reject(
+        new Error(
+          "Upload cancelled."
+        )
+      );
+    });
+
+    xhr.send(selectedFile);
+
+  });
+}
+
+copyBtn.addEventListener("click", async () => {
+
+  try{
+
+    await navigator.clipboard.writeText(url.textContent);
+
+    copyBtn.textContent = "Copied ✓";
+
+    setTimeout(() => {
+      copyBtn.textContent = "Copy Public URL";
+    },1500);
+
+  }catch{
+
+    showError("Could not copy URL.");
+
+  }
+
+});
+</script>
+
+</body>
+</html>
