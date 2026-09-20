@@ -552,7 +552,7 @@ async function uploadEntry(entry){
       method:"POST",
       headers:{"Content-Type":"application/json"},
       body:JSON.stringify({
-        fileName: file.name,
+        fileName: (entry.nameInput?.value || file.name).trim() || file.name,
         contentType: file.type || "application/octet-stream",
         fileSize: file.size
       })
