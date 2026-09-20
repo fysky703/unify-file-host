@@ -83,6 +83,33 @@ button,a,label{font:inherit}
 
 @media(max-width:850px){.page-grid{grid-template-columns:1fr}.queue,.cloud-list{grid-template-columns:repeat(auto-fit,minmax(210px,1fr))}}
 @media(max-width:480px){.queue,.cloud-list{grid-template-columns:1fr;gap:12px}.q-item,.cloud-item{min-height:260px}.q-thumb,.cloud-icon{height:180px}.topbar{gap:10px}.main-nav{gap:3px}.main-nav a{padding:8px 7px}.header h1{font-size:23px}}
+
+/* Media poster enhancements */
+.q-thumb,.cloud-visual{position:relative}
+.media-play{position:absolute;top:50%;left:50%;width:48px;height:48px;display:grid;place-items:center;transform:translate(-50%,-50%);border:1px solid rgba(255,255,255,.75);border-radius:50%;color:#111;background:rgba(255,255,255,.92);font-size:20px;box-shadow:0 8px 24px #0008;pointer-events:none}
+.waveform{width:100%;height:100%;display:flex;align-items:center;justify-content:center;gap:4px;padding:20px;background:radial-gradient(circle at 50% 45%,#555,transparent 65%),linear-gradient(145deg,#2c2e36,#0b0c10)}
+.waveform i{width:4px;border-radius:99px;background:linear-gradient(#fff,#777);animation:wave 1.1s ease-in-out infinite alternate}
+.waveform i:nth-child(2n){animation-delay:-.25s}.waveform i:nth-child(3n){animation-delay:-.5s}
+@keyframes wave{from{height:18%}to{height:78%}}
+.genre-tabs{display:flex;gap:8px;flex-wrap:wrap;margin-top:18px}
+.genre-tab{padding:8px 12px;border:1px solid var(--line);border-radius:999px;color:#999da7;background:#111318;cursor:pointer;font-size:11px;font-weight:800}
+.genre-tab.active,.genre-tab:hover{color:#080808;background:#fff;border-color:#fff}
+.genre-hidden{display:none!important}
+.cloud-visual{width:100%;height:150px;overflow:hidden;border-radius:13px;background:linear-gradient(145deg,#272a31,#0d0e11)}
+.cloud-visual img,.cloud-visual video{width:100%;height:100%;display:block;object-fit:cover}
+.cloud-visual .waveform{height:100%}.cloud-visual .media-play{width:44px;height:44px}
+.cloud-actions{display:flex;grid-column:1 / -1;gap:6px;grid-row:4}
+.cloud-copy{flex:1;min-height:36px;display:flex;align-items:center;justify-content:center;border:1px solid var(--line-bright);border-radius:9px;color:#c6c8ce;background:transparent;cursor:pointer;font-size:11px}
+.cloud-copy:hover{color:#080808;background:#fff}
+@media(max-width:480px){
+  .queue,.cloud-list{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+  .q-item,.cloud-item{min-height:246px;padding:10px;border-radius:15px;gap:9px}
+  .q-thumb,.cloud-visual,.cloud-icon{height:126px;border-radius:10px}
+  .q-name,.cloud-name{font-size:12px}.q-meta,.cloud-meta{font-size:9px}
+  .q-del{top:8px;right:8px;width:27px;height:27px}
+  .q-url{font-size:8px;padding:5px}.q-copy{padding:5px 6px;font-size:9px}
+  .cloud-open,.cloud-delete,.cloud-copy{min-height:30px;padding:6px 4px;font-size:9px}
+}
 </style>
 </head>
 
@@ -104,7 +131,7 @@ button,a,label{font:inherit}
 
   <div class="header">
     <h1>UNiFY File Host</h1>
-    <p>Upload ឯកសារទៅ Cloudflare R2 · Max 500 MB ក្នុងមួយឯកសារ</p>
+    <p>Upload ឯកសារទៅ Cloudflare R2 · Max 500 MB ក្នុងមួយឯកសារ</p><div class="genre-tabs" id="genreTabs"><button class="genre-tab active" data-genre="all">All</button><button class="genre-tab" data-genre="image">Images</button><button class="genre-tab" data-genre="video">Videos</button><button class="genre-tab" data-genre="audio">Music</button><button class="genre-tab" data-genre="other">Files</button></div>
   </div>
 
   <!-- Drop zone -->
@@ -184,6 +211,14 @@ function mimeCategory(file){
   return "other";
 }
 
+function categoryFromName(name, type=""){
+  if(type.startsWith("image/") || /\.(png|jpe?g|gif|webp|svg|avif)$/i.test(name)) return "image";
+  if(type.startsWith("video/") || /\.(mp4|mov|avi|mkv|webm|m4v)$/i.test(name)) return "video";
+  if(type.startsWith("audio/") || /\.(mp3|wav|ogg|m4a|flac|aac)$/i.test(name)) return "audio";
+  return "other";
+}
+function escapeHtml(value){return String(value).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]));}
+function waveformHtml(){return `<div class="waveform" aria-label="Audio waveform">${Array.from({length:24},(_,i)=>`<i style="height:${22+(i*17)%62}%"></i>`).join("")}</div>`;}
 function fileIcon(file){
   const c = mimeCategory(file);
   if(c==="image") return "🖼️";
@@ -238,6 +273,13 @@ function buildThumb(file, onclick){
     vid.preload = "metadata";
     vid.addEventListener("loadedmetadata",()=>{vid.currentTime=1});
     wrap.appendChild(vid);
+    const play = document.createElement("span");
+    play.className = "media-play";
+    play.textContent = "▶";
+    wrap.appendChild(play);
+    wrap.addEventListener("click", onclick);
+  } else if(cat === "audio"){
+    wrap.innerHTML = waveformHtml();
     wrap.addEventListener("click", onclick);
   } else {
     wrap.textContent = fileIcon(file);
@@ -323,6 +365,7 @@ function renderQueueItem(entry){
   const item = document.createElement("div");
   item.className = "q-item";
   item.dataset.id = id;
+  item.dataset.genre = categoryFromName(file.name, file.type);
   entry.itemEl = item;
 
   // Thumbnail
@@ -539,6 +582,26 @@ function setStatus(entry, status, errMsg=""){
   if(barEl) barEl.style.width = status==="done" ? "100%" : "0%";
 }
 
+function renderCloudCard(file){
+  const category = categoryFromName(file.name);
+  const safeName = escapeHtml(file.name);
+  let visual = category === "image"
+    ? `<img src="${file.url}" alt="${safeName}" loading="lazy">`
+    : category === "video"
+      ? `<video src="${file.url}" muted preload="metadata"></video><span class="media-play">▶</span>`
+      : category === "audio" ? waveformHtml() : `<div class="cloud-icon">📄</div>`;
+  return `<article class="cloud-item" data-key="${encodeURIComponent(file.key)}" data-genre="${category}"><div class="cloud-visual">${visual}</div><div class="cloud-info"><div class="cloud-name" title="${safeName}">${safeName}</div><div class="cloud-meta">${fmtSize(file.size || 0)} · ${new Date(file.lastModified).toLocaleString()}</div></div><div class="cloud-actions"><a class="cloud-open" href="${file.url}" target="_blank" rel="noopener">Open</a><button class="cloud-copy" data-copy-url="${escapeHtml(file.url)}">⧉ Copy</button><button class="cloud-delete" data-delete-key="${encodeURIComponent(file.key)}">Delete</button></div></article>`;
+}
+async function copyUrl(url, button){
+  try{await navigator.clipboard.writeText(url);const old=button.textContent;button.textContent="✓ Copied";setTimeout(()=>button.textContent=old,1400)}
+  catch{showError("មិនអាច Copy URL បានទេ")}
+}
+function applyGenreFilter(){
+  const active=document.querySelector(".genre-tab.active")?.dataset.genre || "all";
+  document.querySelectorAll("[data-genre]").forEach(el=>{if(!el.classList.contains("genre-tab"))el.classList.toggle("genre-hidden",active!=="all"&&el.dataset.genre!==active)});
+}
+document.querySelectorAll(".genre-tab").forEach(tab=>tab.addEventListener("click",()=>{document.querySelectorAll(".genre-tab").forEach(t=>t.classList.remove("active"));tab.classList.add("active");applyGenreFilter()}));
+
 async function loadCloudFiles(){
   const list = document.getElementById("cloudList");
   const count = document.getElementById("cloudCount");
@@ -550,8 +613,10 @@ async function loadCloudFiles(){
     count.textContent = `${data.files.length} files`;
     deleteAll.style.display = data.files.length ? "block" : "none";
     if(!data.files.length){list.innerHTML='<div class="cloud-empty">មិនទាន់មានឯកសារនៅក្នុង R2 ទេ</div>';return;}
-    list.innerHTML = data.files.map(file => `<article class="cloud-item" data-key="${encodeURIComponent(file.key)}"><div class="cloud-icon">📄</div><div class="cloud-info"><div class="cloud-name" title="${file.name}">${file.name}</div><div class="cloud-meta">${fmtSize(file.size || 0)} · ${new Date(file.lastModified).toLocaleString()}</div></div><a class="cloud-open" href="${file.url}" target="_blank" rel="noopener">Open</a><button class="cloud-delete" data-delete-key="${encodeURIComponent(file.key)}">Delete</button></article>`).join("");
+    list.innerHTML = data.files.map(renderCloudCard).join("");
     list.querySelectorAll("[data-delete-key]").forEach(button=>button.addEventListener("click",()=>deleteCloudFile(decodeURIComponent(button.dataset.deleteKey),button)));
+    list.querySelectorAll("[data-copy-url]").forEach(button=>button.addEventListener("click",()=>copyUrl(button.dataset.copyUrl,button)));
+    applyGenreFilter();
   }catch(error){list.innerHTML=`<div class="cloud-empty">${error.message}</div>`;}
 }
 
