@@ -63,26 +63,19 @@ button,a,label{font:inherit}
 
 /* Poster card layout */
 .queue,.cloud-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;max-height:none}
-.q-item,.cloud-item{min-width:0;min-height:280px;display:flex;flex-direction:column;align-items:stretch;justify-content:flex-start;gap:12px;padding:14px;border-radius:18px;overflow:hidden}
-.q-thumb{width:100%;aspect-ratio:3/4;height:auto;min-height:180px;flex-shrink:0;border-radius:13px;font-size:42px;background:linear-gradient(145deg,#272a31,#0d0e11)}
+.q-item,.cloud-item{position:relative;min-width:0;min-height:280px;display:flex;flex-direction:column;align-items:stretch;justify-content:flex-start;gap:12px;padding:14px;border-radius:18px;overflow:hidden}
+.q-thumb,.cloud-visual,.cloud-icon{width:100%;aspect-ratio:3/4;height:auto;min-height:180px;flex-shrink:0;border-radius:13px;font-size:42px;background:linear-gradient(145deg,#272a31,#0d0e11)}
 .q-info,.cloud-info{width:100%;flex:none}
 .q-name,.cloud-name{font-size:14px;line-height:1.35}
 .q-meta,.cloud-meta{line-height:1.45;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .q-badge{align-self:flex-start}
-.q-del{position:absolute;top:12px;right:12px;width:32px;height:32px;border-radius:50%;background:rgba(0,0,0,.7);backdrop-filter:blur(8px)}
-.q-url-row{margin-top:auto}
-.cloud-icon{width:100%;aspect-ratio:3/4;height:auto;min-height:180px;flex-shrink:0;border-radius:13px;font-size:52px;background:linear-gradient(145deg,#272a31,#0d0e11)}
-.cloud-open,.cloud-delete{flex:1;min-height:36px}
-.cloud-item:has(.cloud-open){padding-bottom:12px}
-.cloud-item .cloud-open,.cloud-item .cloud-delete{margin-top:auto}
-.cloud-item{display:grid;grid-template-columns:1fr 1fr;grid-template-rows:auto auto 1fr auto}
-.cloud-item .cloud-icon{grid-column:1 / -1;grid-row:1}
-.cloud-item .cloud-info{grid-column:1 / -1;grid-row:2}
-.cloud-item .cloud-open{grid-column:1;grid-row:4}
-.cloud-item .cloud-delete{grid-column:2;grid-row:4}
+.q-del,.cloud-copy-fab{position:absolute;top:12px;right:12px;width:32px;height:32px;border-radius:50%;background:rgba(0,0,0,.7);backdrop-filter:blur(8px)}
+.q-url-row,.cloud-actions{margin-top:auto}
+.cloud-open,.cloud-delete,.cloud-copy{flex:1;min-height:36px}
+.cloud-item{display:flex;flex-direction:column;align-items:stretch}
 
 @media(max-width:850px){.page-grid{grid-template-columns:1fr}.queue,.cloud-list{grid-template-columns:repeat(auto-fit,minmax(210px,1fr))}}
-@media(max-width:480px){.queue,.cloud-list{grid-template-columns:1fr;gap:12px}.q-item,.cloud-item{min-height:260px}.q-thumb,.cloud-icon{height:180px}.topbar{gap:10px}.main-nav{gap:3px}.main-nav a{padding:8px 7px}.header h1{font-size:23px}}
+@media(max-width:480px){.topbar{gap:10px}.main-nav{gap:3px}.main-nav a{padding:8px 7px}.header h1{font-size:23px}}
 
 /* Media poster enhancements */
 .q-thumb,.cloud-visual{position:relative}
@@ -95,13 +88,15 @@ button,a,label{font:inherit}
 .genre-tab{padding:8px 12px;border:1px solid var(--line);border-radius:999px;color:#999da7;background:#111318;cursor:pointer;font-size:11px;font-weight:800}
 .genre-tab.active,.genre-tab:hover{color:#080808;background:#fff;border-color:#fff}
 .genre-hidden{display:none!important}
-.cloud-visual{width:100%;aspect-ratio:3/4;height:auto;min-height:180px;overflow:hidden;border-radius:13px;background:linear-gradient(145deg,#272a31,#0d0e11)}
-.cloud-visual img,.cloud-visual video{width:100%;height:100%;display:block;object-fit:cover;object-position:center}
-.cloud-visual .waveform{height:100%}.cloud-visual .media-play{width:44px;height:44px}
-.cloud-actions{display:flex;grid-column:1 / -1;gap:6px;grid-row:4}
-.cloud-copy{flex:1;min-height:36px;display:flex;align-items:center;justify-content:center;border:1px solid var(--line-bright);border-radius:9px;color:#c6c8ce;background:transparent;cursor:pointer;font-size:11px}
-.cloud-copy:hover{color:#080808;background:#fff}
-.q-thumb img,.q-thumb video,.cloud-visual img,.cloud-visual video{width:100%;height:100%;display:block;object-fit:cover;object-position:center;background:#090a0d}
+.cloud-visual{position:relative;overflow:hidden;cursor:pointer}
+.cloud-visual img,.cloud-visual video,.q-thumb img,.q-thumb video{width:100%;height:100%;display:block;object-fit:cover;object-position:center;background:#090a0d}
+.cloud-visual .waveform,.q-thumb .waveform{height:100%}
+.cloud-visual .media-play{width:44px;height:44px}
+.cloud-actions{display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+.cloud-copy{width:auto;min-height:unset;padding:6px 10px;font-size:10px;display:flex;align-items:center;justify-content:center;border:1px solid var(--line-bright);border-radius:9px;color:#c6c8ce;background:transparent;cursor:pointer}
+.cloud-copy:hover,.cloud-copy-fab:hover{color:#080808;background:#fff}
+.cloud-copy-fab{display:flex;align-items:center;justify-content:center;border:1px solid var(--line-bright);color:#c6c8ce;cursor:pointer;font-size:13px;z-index:2}
+.cloud-item .cloud-open,.cloud-item .cloud-delete{flex:1;min-height:36px}
 .q-name-input{width:100%;border:1px solid var(--line);border-radius:8px;padding:7px 9px;color:#fff;background:#090a0d;outline:none;font-size:13px}
 .q-name-input:focus{border-color:#fff;box-shadow:0 0 16px rgba(255,255,255,.12)}
 @media(max-width:480px){
@@ -109,9 +104,9 @@ button,a,label{font:inherit}
   .q-item,.cloud-item{min-height:246px;padding:10px;border-radius:15px;gap:9px}
   .q-thumb,.cloud-visual,.cloud-icon{aspect-ratio:3/4;height:auto;min-height:140px;border-radius:10px}
   .q-name,.cloud-name{font-size:12px}.q-meta,.cloud-meta{font-size:9px}
-  .q-del{top:8px;right:8px;width:27px;height:27px}
+  .q-del,.cloud-copy-fab{top:8px;right:8px;width:27px;height:27px}
   .q-url{font-size:8px;padding:5px}.q-copy{padding:5px 6px;font-size:9px}
-  .cloud-open,.cloud-delete,.cloud-copy{min-height:30px;padding:6px 4px;font-size:9px}
+  .cloud-open,.cloud-delete{min-height:30px;padding:6px 4px;font-size:9px}
 }
 </style>
 </head>
@@ -617,7 +612,7 @@ function renderCloudCard(file){
     : category === "video"
       ? `<video src="${file.url}" muted preload="metadata"></video><span class="media-play">▶</span>`
       : category === "audio" ? waveformHtml() : `<div class="cloud-icon">📄</div>`;
-  return `<article class="cloud-item" data-key="${encodeURIComponent(file.key)}" data-genre="${category}" data-preview-url="${escapeHtml(file.url)}" data-preview-category="${category}" data-preview-name="${safeName}"><div class="cloud-visual">${visual}</div><div class="cloud-info"><div class="cloud-name" title="${safeName}">${safeName}</div><div class="cloud-meta">${fmtSize(file.size || 0)} · ${new Date(file.lastModified).toLocaleString()}</div></div><div class="cloud-actions"><a class="cloud-open" href="${file.url}" target="_blank" rel="noopener">Open</a><button class="cloud-copy" data-copy-url="${escapeHtml(file.url)}">⧉ Copy</button><button class="cloud-delete" data-delete-key="${encodeURIComponent(file.key)}">Delete</button></div></article>`;
+  return `<article class="cloud-item" data-key="${encodeURIComponent(file.key)}" data-genre="${category}" data-preview-url="${escapeHtml(file.url)}" data-preview-category="${category}" data-preview-name="${safeName}"><button class="cloud-copy-fab" data-copy-url="${escapeHtml(file.url)}" title="Copy URL" aria-label="Copy URL">⧉</button><div class="cloud-visual">${visual}</div><div class="cloud-info"><div class="cloud-name" title="${safeName}">${safeName}</div><div class="cloud-meta">${fmtSize(file.size || 0)} · ${new Date(file.lastModified).toLocaleString()}</div></div><div class="cloud-actions"><a class="cloud-open" href="${file.url}" target="_blank" rel="noopener">Open</a><button class="cloud-delete" data-delete-key="${encodeURIComponent(file.key)}">Delete</button></div></article>`;
 }
 async function copyUrl(url, button){
   try{await navigator.clipboard.writeText(url);const old=button.textContent;button.textContent="✓ Copied";setTimeout(()=>button.textContent=old,1400)}
