@@ -101,6 +101,9 @@ button,a,label{font:inherit}
 .cloud-actions{display:flex;grid-column:1 / -1;gap:6px;grid-row:4}
 .cloud-copy{flex:1;min-height:36px;display:flex;align-items:center;justify-content:center;border:1px solid var(--line-bright);border-radius:9px;color:#c6c8ce;background:transparent;cursor:pointer;font-size:11px}
 .cloud-copy:hover{color:#080808;background:#fff}
+.q-thumb img,.q-thumb video,.cloud-visual img,.cloud-visual video{width:100%;height:100%;display:block;object-fit:cover;object-position:center}
+.q-name-input{width:100%;border:1px solid var(--line);border-radius:8px;padding:7px 9px;color:#fff;background:#090a0d;outline:none;font-size:13px}
+.q-name-input:focus{border-color:#fff;box-shadow:0 0 16px rgba(255,255,255,.12)}
 @media(max-width:480px){
   .queue,.cloud-list{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
   .q-item,.cloud-item{min-height:246px;padding:10px;border-radius:15px;gap:9px}
@@ -333,9 +336,30 @@ document.addEventListener("keydown", e=>{
 });
 function closePreview(){
   previewModal.classList.remove("open");
-  // Stop any playing media
   previewInner.querySelectorAll("video,audio").forEach(m=>{m.pause();m.src=""});
   previewInner.innerHTML="";
+}
+
+function openRemotePreview(url, category, name=""){
+  previewInner.innerHTML="";
+  let el;
+  if(category === "image"){
+    el = document.createElement("img");
+    el.src = url;
+    el.alt = name;
+  } else if(category === "video"){
+    el = document.createElement("video");
+    el.src = url;
+    el.controls = true;
+    el.autoplay = true;
+  } else if(category === "audio"){
+    el = document.createElement("audio");
+    el.src = url;
+    el.controls = true;
+    el.autoplay = true;
+  } else return;
+  previewInner.appendChild(el);
+  previewModal.classList.add("open");
 }
 
 // ────────────────────────────────────────────
@@ -376,9 +400,12 @@ function renderQueueItem(entry){
   const info = document.createElement("div");
   info.className = "q-info";
 
-  const name = document.createElement("div");
-  name.className = "q-name";
-  name.textContent = file.name;
+  const name = document.createElement("input");
+  name.className = "q-name-input";
+  name.type = "text";
+  name.value = file.name;
+  name.setAttribute("aria-label", "Rename file before upload");
+  entry.nameInput = name;
 
   const meta = document.createElement("div");
   meta.className = "q-meta";
@@ -590,7 +617,7 @@ function renderCloudCard(file){
     : category === "video"
       ? `<video src="${file.url}" muted preload="metadata"></video><span class="media-play">▶</span>`
       : category === "audio" ? waveformHtml() : `<div class="cloud-icon">📄</div>`;
-  return `<article class="cloud-item" data-key="${encodeURIComponent(file.key)}" data-genre="${category}"><div class="cloud-visual">${visual}</div><div class="cloud-info"><div class="cloud-name" title="${safeName}">${safeName}</div><div class="cloud-meta">${fmtSize(file.size || 0)} · ${new Date(file.lastModified).toLocaleString()}</div></div><div class="cloud-actions"><a class="cloud-open" href="${file.url}" target="_blank" rel="noopener">Open</a><button class="cloud-copy" data-copy-url="${escapeHtml(file.url)}">⧉ Copy</button><button class="cloud-delete" data-delete-key="${encodeURIComponent(file.key)}">Delete</button></div></article>`;
+  return `<article class="cloud-item" data-key="${encodeURIComponent(file.key)}" data-genre="${category}" data-preview-url="${escapeHtml(file.url)}" data-preview-category="${category}" data-preview-name="${safeName}"><div class="cloud-visual">${visual}</div><div class="cloud-info"><div class="cloud-name" title="${safeName}">${safeName}</div><div class="cloud-meta">${fmtSize(file.size || 0)} · ${new Date(file.lastModified).toLocaleString()}</div></div><div class="cloud-actions"><a class="cloud-open" href="${file.url}" target="_blank" rel="noopener">Open</a><button class="cloud-copy" data-copy-url="${escapeHtml(file.url)}">⧉ Copy</button><button class="cloud-delete" data-delete-key="${encodeURIComponent(file.key)}">Delete</button></div></article>`;
 }
 async function copyUrl(url, button){
   try{await navigator.clipboard.writeText(url);const old=button.textContent;button.textContent="✓ Copied";setTimeout(()=>button.textContent=old,1400)}
@@ -616,6 +643,10 @@ async function loadCloudFiles(){
     list.innerHTML = data.files.map(renderCloudCard).join("");
     list.querySelectorAll("[data-delete-key]").forEach(button=>button.addEventListener("click",()=>deleteCloudFile(decodeURIComponent(button.dataset.deleteKey),button)));
     list.querySelectorAll("[data-copy-url]").forEach(button=>button.addEventListener("click",()=>copyUrl(button.dataset.copyUrl,button)));
+    list.querySelectorAll(".cloud-visual").forEach(visual=>visual.addEventListener("click",()=>{
+      const card = visual.closest(".cloud-item");
+      openRemotePreview(card.dataset.previewUrl, card.dataset.previewCategory, card.dataset.previewName);
+    }));
     applyGenreFilter();
   }catch(error){list.innerHTML=`<div class="cloud-empty">${error.message}</div>`;}
 }
