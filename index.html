@@ -1,892 +1,172 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="km">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>KATANA REELS — Twixtor Packs for Editors</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&family=Noto+Sans+Khmer:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>UNiFY File Host</title>
+
 <style>
-  :root{
-    --bg:#0d0809;
-    --bg-2:#21090b;
-    --panel:#180d0f;
-    --panel-2:#241012;
-    --line:rgba(255,255,255,.14);
-    --ink:#f8f6f6;
-    --ink-dim:#d3cdd0;
-    --ink-mute:#938b8f;
-    --flame-1:#ff202f;
-    --flame-2:#ff3d58;
-    --flame-3:#ff6979;
-    --spark:#ff304d;
-    --focus:#ff3d58;
-    --radius-lg:26px;
-    --radius-md:16px;
-    --radius-sm:10px;
-  }
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#06070a;--panel:#111318;--panel-soft:#181a20;--panel-hover:#20232b;
+  --line:rgba(255,255,255,.12);--line-bright:rgba(255,255,255,.28);
+  --text:#fff;--muted:#9b9da5;--silver:#f3f3f3;--danger:#ff7777;
+  --radius:22px;--shadow:0 24px 70px rgba(0,0,0,.52);--glow:0 0 28px rgba(255,255,255,.08)
+}
+html{scroll-behavior:smooth}
+body{
+  min-height:100vh;padding:0 22px 72px;color:var(--text);
+  font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
+  font-size:14px;background:
+  radial-gradient(900px 420px at 50% -140px,rgba(255,255,255,.16),transparent 68%),
+  radial-gradient(600px 500px at 100% 50%,rgba(255,255,255,.035),transparent 70%),var(--bg)
+}
+button,a,label{font:inherit}
+.site-shell{width:min(1180px,100%);margin:auto}
+.topbar{
+  height:82px;display:flex;align-items:center;justify-content:space-between;
+  border-bottom:1px solid var(--line);margin-bottom:42px
+}
+.brand{display:flex;align-items:center;gap:12px;color:#fff;text-decoration:none;font-size:20px;font-weight:900;letter-spacing:.14em}
+.brand-mark{width:40px;height:40px;display:grid;place-items:center;border-radius:13px;color:#080808;background:linear-gradient(145deg,#fff 8%,#777);box-shadow:0 0 28px rgba(255,255,255,.2)}
+.main-nav{display:flex;align-items:center;gap:8px}
+.main-nav a{padding:11px 16px;border:1px solid transparent;border-radius:11px;color:#9799a1;text-decoration:none;font-size:13px;font-weight:700;transition:.2s}
+.main-nav a:hover,.main-nav a.active{color:#080808;background:#fff;box-shadow:0 8px 24px rgba(255,255,255,.12)}
+.page-grid{display:grid;grid-template-columns:minmax(0,1.16fr) minmax(340px,.84fr);gap:24px;align-items:start}
+.card,.cloud-panel{
+  width:100%;border:1px solid var(--line-bright);border-radius:var(--radius);
+  background:linear-gradient(145deg,rgba(29,31,37,.96),rgba(10,11,14,.97));
+  box-shadow:var(--shadow),var(--glow)
+}
+.card{padding:34px}.cloud-panel{padding:27px}
+.header{margin-bottom:28px}.header h1{font-size:31px;line-height:1.1;letter-spacing:-.8px;color:#fff;background:linear-gradient(110deg,#fff,#92949b);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.header p{margin-top:9px;color:var(--muted);font-size:13px}
+.drop{min-height:245px;width:100%;display:flex;align-items:center;justify-content:center;padding:28px 20px;text-align:center;cursor:pointer;border:1px dashed rgba(255,255,255,.34);border-radius:18px;background:rgba(255,255,255,.025);transition:.25s}
+.drop:hover,.drop.drag{border-color:#fff;background:rgba(255,255,255,.08);box-shadow:inset 0 0 34px rgba(255,255,255,.04),0 0 30px rgba(255,255,255,.09)}
+.drop-icon{font-size:46px;margin-bottom:15px;filter:grayscale(1)}.drop-label{font-size:16px;font-weight:800}.drop-hint{margin-top:8px;color:#85878f;font-size:12px}input[type=file]{display:none}
+.queue{display:flex;flex-direction:column;gap:10px;margin-top:20px}.queue:empty{display:none}
+.q-item,.cloud-item{position:relative;display:flex;align-items:center;gap:12px;border:1px solid var(--line);background:linear-gradient(145deg,#1b1d23,#111216);transition:.2s}
+.q-item{padding:13px 14px;border-radius:15px;overflow:hidden}.q-item:hover,.cloud-item:hover{border-color:#777;box-shadow:var(--glow)}
+.q-item.done{border-color:rgba(255,255,255,.34)}.q-item.errored{border-color:rgba(255,119,119,.42)}
+.q-thumb{width:54px;height:54px;flex-shrink:0;display:flex;align-items:center;justify-content:center;overflow:hidden;border:1px solid var(--line);border-radius:11px;background:#0b0c0f;font-size:24px}.q-thumb img,.q-thumb video{width:100%;height:100%;display:block;object-fit:cover}
+.q-info,.cloud-info{min-width:0;flex:1}.q-name,.cloud-name{font-weight:750;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.q-meta,.cloud-meta{margin-top:4px;color:#888b94;font-size:11px}
+.q-badge{flex-shrink:0;padding:5px 9px;border-radius:99px;font-size:10px;font-weight:800;white-space:nowrap}.badge-ready,.badge-uploading{background:#292c34;color:#b4b6bd}.badge-done{background:#eee;color:#111}.badge-error{background:rgba(255,80,80,.14);color:#ff9d9d}
+.q-del,.q-copy,.cloud-open,.cloud-delete{display:flex;align-items:center;justify-content:center;border:1px solid var(--line-bright);border-radius:9px;background:transparent;color:#c6c8ce;cursor:pointer;transition:.18s}.q-del{width:31px;height:31px;flex-shrink:0;padding:0;font-size:14px}.q-del:hover,.cloud-delete:hover{border-color:var(--danger);color:var(--danger);background:rgba(255,90,90,.08)}.q-del:disabled{opacity:.3;cursor:not-allowed}
+.q-prog{display:none;position:absolute;right:0;bottom:0;left:0;height:3px;background:rgba(255,255,255,.08)}.q-bar{height:100%;width:0;background:linear-gradient(90deg,#fff,#777);transition:width .12s linear}.q-item.uploading .q-prog{display:block}
+.q-url-row{display:flex;align-items:center;gap:7px;margin-top:8px;flex-wrap:wrap}.q-url{min-width:0;flex:1;padding:6px 9px;overflow:hidden;border-radius:8px;background:#090a0d;color:#bcbec4;font-size:10px;text-overflow:ellipsis;white-space:nowrap}.q-copy{width:auto!important;min-height:unset!important;margin-top:0!important;padding:6px 10px;font-size:10px}.q-copy:hover{color:#080808;background:#fff}
+.actions{display:flex;align-items:center;gap:10px;margin-top:20px}.btn-primary,.btn-clear{min-height:50px;border-radius:13px;cursor:pointer;font-weight:800;transition:.2s}.btn-primary{flex:1;border:0;color:#080808;background:linear-gradient(135deg,#fff,#888);box-shadow:0 12px 28px rgba(255,255,255,.11)}.btn-primary:hover:not(:disabled){transform:translateY(-2px);filter:brightness(1.08)}.btn-primary:disabled{opacity:.4;cursor:not-allowed}.btn-clear{padding:0 20px;border:1px solid var(--line-bright);color:#c9cbd0;background:transparent}.btn-clear:hover{border-color:#fff;color:#fff;background:rgba(255,255,255,.08)}
+.panel-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px}.panel-heading h2{font-size:19px}.panel-heading p{margin-top:6px;color:#8c8e96;font-size:12px}.cloud-count{padding:6px 10px;border:1px solid #555;border-radius:99px;color:#ddd;font-size:11px;white-space:nowrap}.cloud-list{display:flex;flex-direction:column;gap:9px;max-height:540px;overflow:auto}.cloud-empty{padding:40px 12px;text-align:center;color:#777;border:1px dashed #444;border-radius:14px;font-size:13px}.cloud-item{padding:12px;border-radius:14px}.cloud-icon{width:39px;height:39px;display:grid;place-items:center;flex-shrink:0;border-radius:10px;background:#292b30;font-size:18px;filter:grayscale(1)}.cloud-open,.cloud-delete{width:auto;padding:7px 10px;font-size:11px;text-decoration:none}.cloud-open:hover{color:#080808;background:#fff}.danger-button{width:100%;margin-top:14px;padding:11px 12px;border:1px solid #754848;border-radius:10px;color:#ffb0b0;background:rgba(120,20,20,.18);cursor:pointer;font-size:11px}.danger-button:hover{background:rgba(180,30,30,.3)}
+.error{display:none;margin-top:14px;padding:12px 14px;border:1px solid rgba(255,119,119,.35);border-radius:12px;color:#ffb0b0;background:rgba(120,20,20,.18);font-size:13px}.error.show{display:block}.footer{margin-top:26px;text-align:center;color:#666a73;font-size:11px}
+.preview-modal{display:none;position:fixed;inset:0;z-index:9999;align-items:center;justify-content:center;padding:20px;background:rgba(0,0,0,.88);backdrop-filter:blur(14px)}.preview-modal.open{display:flex}.preview-inner{position:relative;display:flex;align-items:center;justify-content:center;max-width:min(860px,100%);max-height:90vh;overflow:hidden;border-radius:18px;background:#101114;box-shadow:0 40px 100px #000}.preview-inner img,.preview-inner video,.preview-inner audio{display:block;max-width:100%;max-height:85vh;object-fit:contain}.preview-inner audio{min-width:280px;padding:30px}.preview-close{position:absolute;top:12px;right:12px;z-index:10;width:34px!important;height:34px;min-height:unset!important;margin-top:0!important;border:1px solid var(--line-bright);border-radius:50%;color:#fff;background:rgba(0,0,0,.65);cursor:pointer;font-size:18px;line-height:1}.preview-close:hover{background:rgba(255,80,80,.3)}
+@media(max-width:850px){.page-grid{grid-template-columns:1fr}.topbar{margin-bottom:24px}.cloud-list{max-height:none}}
+@media(max-width:560px){body{padding:0 10px 48px}.topbar{height:70px}.brand{font-size:16px;letter-spacing:.1em}.brand-mark{width:35px;height:35px}.main-nav a{padding:8px 9px;font-size:11px}.card,.cloud-panel{padding:20px;border-radius:18px}.header h1{font-size:25px}.drop{min-height:190px}.q-item,.cloud-item{gap:8px}.q-thumb{width:44px;height:44px}.q-badge{display:none}.actions{flex-direction:column}.btn-primary,.btn-clear{width:100%}.cloud-open,.cloud-delete{padding:7px 8px;font-size:10px}}
 
-  *{box-sizing:border-box;}
-  html{scroll-padding-top:calc(env(safe-area-inset-top,0px) + 90px); scroll-behavior:smooth;}
-  html,body{height:100%;}
-  body{
-    margin:0;
-    background:
-      radial-gradient(950px 620px at 8% 10%, rgba(130,11,17,.62), transparent 68%),
-      radial-gradient(780px 600px at 95% 58%, rgba(83,8,14,.38), transparent 70%),
-      linear-gradient(145deg,#270b0d 0%,#16090b 43%,#0b0809 73%,#050506 100%);
-    background-attachment:fixed;
-    color:var(--ink);
-    font-family:'Inter','Noto Sans Khmer',system-ui,sans-serif;
-    -webkit-font-smoothing:antialiased;
-    overflow-x:hidden;
-    padding-top:env(safe-area-inset-top,0px);
-    padding-bottom:env(safe-area-inset-bottom,0px);
-  }
-  @media (prefers-reduced-motion: reduce){
-    *{animation-duration:.001ms !important; animation-iteration-count:1 !important; transition-duration:.001ms !important; scroll-behavior:auto !important;}
-  }
-  h1,h2,h3,.display{font-family:'Baloo 2','Noto Sans Khmer',system-ui,sans-serif;}
-  .mono{font-family:'JetBrains Mono',monospace;}
-  a{color:inherit; text-decoration:none;}
-  img,svg{display:block; max-width:100%;}
-  button{font:inherit; color:inherit;}
-  ::selection{background:var(--flame-1); color:#150707;}
-  :focus-visible{outline:2px solid var(--focus); outline-offset:3px; border-radius:6px;}
+/* Poster card layout */
+.queue,.cloud-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;max-height:none}
+.q-item,.cloud-item{position:relative;min-width:0;min-height:280px;display:flex;flex-direction:column;align-items:stretch;justify-content:flex-start;gap:12px;padding:14px;border-radius:18px;overflow:hidden}
+.q-thumb,.cloud-visual,.cloud-icon{width:100%;aspect-ratio:3/4;height:auto;min-height:180px;flex-shrink:0;border-radius:13px;font-size:42px;background:linear-gradient(145deg,#272a31,#0d0e11)}
+.q-info,.cloud-info{width:100%;flex:none}
+.q-name,.cloud-name{font-size:14px;line-height:1.35}
+.q-meta,.cloud-meta{line-height:1.45;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.q-badge{align-self:flex-start}
+.q-del,.cloud-copy-fab{position:absolute;top:12px;right:12px;width:32px;height:32px;border-radius:50%;background:rgba(0,0,0,.7);backdrop-filter:blur(8px)}
+.q-url-row,.cloud-actions{margin-top:auto}
+.cloud-open,.cloud-delete,.cloud-copy{flex:1;min-height:36px}
+.cloud-item{display:flex;flex-direction:column;align-items:stretch}
 
-  .wrap{max-width:1180px; margin:0 auto; padding:0 20px;}
-  @media (min-width:900px){ .wrap{padding:0 40px;} }
+@media(max-width:850px){.page-grid{grid-template-columns:1fr}.queue,.cloud-list{grid-template-columns:repeat(auto-fit,minmax(210px,1fr))}}
+@media(max-width:480px){.topbar{gap:10px}.main-nav{gap:3px}.main-nav a{padding:8px 7px}.header h1{font-size:23px}}
 
-  /* ---------- Header ---------- */
-  header.site{
-    position:sticky; top:env(safe-area-inset-top,0px); z-index:60;
-    padding:30px 16px 14px;
-  }
-  .nav-shell{
-    max-width:1180px; margin:0 auto;
-    display:flex; align-items:center; justify-content:space-between;
-    background:rgba(18,7,9,.82);
-    backdrop-filter:blur(18px) saturate(130%);
-    -webkit-backdrop-filter:blur(18px) saturate(130%);
-    border:1px solid rgba(255,255,255,.16);
-    border-radius:999px;
-    padding:13px 14px 13px 24px;
-    box-shadow:0 18px 38px rgba(0,0,0,.28), inset 0 1px rgba(255,255,255,.04);
-  }
-  .brand{display:flex; align-items:center; gap:11px;}
-  .brand-mark{width:42px; height:42px; flex:none;}
-  .brand-text{line-height:1.02;}
-  .brand-text .k1{font-family:'Baloo 2'; font-weight:800; font-size:20px; letter-spacing:1px; color:#fff;}
-  .brand-text .k2{font-family:'Baloo 2'; font-weight:700; font-size:11px; letter-spacing:4px; color:var(--flame-1); margin-top:3px;}
-
-  .nav-links{display:none; align-items:center; gap:clamp(14px,2vw,28px); font-size:14.5px; font-weight:600; color:var(--ink-dim);}
-  .nav-links a{position:relative; padding:6px 0; transition:color .2s ease;}
-  .nav-links a:hover{color:var(--ink);}
-  .nav-links a.on{color:var(--ink);}
-  .nav-links a.on::after{
-    content:""; position:absolute; left:0; right:0; bottom:-2px; height:2px;
-    background:linear-gradient(90deg,var(--flame-1),var(--flame-3)); border-radius:2px;
-  }
-  @media (min-width:860px){ .nav-links{display:flex;} }
-
-  .nav-cta{display:none;}
-  @media (min-width:860px){
-    .nav-cta{
-      display:inline-flex; align-items:center; gap:8px;
-      background:linear-gradient(135deg,var(--flame-1),var(--spark));
-      color:#1a0505; font-weight:700; font-size:13.5px;
-      padding:11px 20px; border-radius:999px; border:none; cursor:pointer;
-      box-shadow:0 8px 22px -8px rgba(255,46,99,.65);
-      transition:transform .18s ease, box-shadow .18s ease;
-    }
-    .nav-cta:hover{transform:translateY(-1px); box-shadow:0 12px 26px -8px rgba(255,46,99,.8);}
-  }
-
-  .burger{
-    width:44px; height:44px; border-radius:50%;
-    border:1px solid var(--line); background:var(--panel);
-    display:flex; align-items:center; justify-content:center;
-    cursor:pointer; flex:none;
-  }
-  @media (min-width:860px){ .burger{display:none;} }
-  .burger span{display:block; width:17px; height:2px; background:var(--ink); border-radius:2px; position:relative;}
-  .burger span::before,.burger span::after{content:""; position:absolute; left:0; width:17px; height:2px; background:var(--ink); border-radius:2px; transition:transform .25s ease, opacity .25s ease;}
-  .burger span::before{top:-6px;}
-  .burger span::after{top:6px;}
-
-  /* ---------- Mobile drawer ---------- */
-  .scrim{position:fixed; inset:0; background:rgba(6,3,3,.6); backdrop-filter:blur(2px); z-index:70; opacity:0; pointer-events:none; transition:opacity .3s ease;}
-  .scrim.show{opacity:1; pointer-events:auto;}
-  .drawer{
-    position:fixed; top:0; right:0; height:100%; width:min(320px,86vw); z-index:80;
-    background:linear-gradient(165deg,#170f10,#0d0808);
-    border-left:1px solid var(--line);
-    transform:translateX(105%);
-    transition:transform .38s cubic-bezier(.22,.9,.3,1);
-    padding:22px 20px calc(24px + env(safe-area-inset-bottom,0px));
-    display:flex; flex-direction:column; gap:6px;
-    overflow-y:auto;
-  }
-  .drawer.open{transform:translateX(0);}
-  .drawer-top{display:flex; align-items:center; justify-content:space-between; margin-bottom:18px;}
-  .drawer-close{width:38px; height:38px; border-radius:50%; border:1px solid var(--line); background:var(--panel); display:flex; align-items:center; justify-content:center; cursor:pointer;}
-  .drawer a.item{
-    display:flex; align-items:center; gap:14px;
-    padding:14px 16px; border-radius:999px; font-weight:600; font-size:15.5px;
-    color:var(--ink-dim); transition:background .2s ease,color .2s ease;
-  }
-  .drawer a.item svg{width:19px; height:19px; flex:none;}
-  .drawer a.item.active{background:linear-gradient(120deg,var(--flame-1),var(--spark)); color:#1a0505;}
-  .drawer a.item:not(.active):hover{background:var(--panel); color:var(--ink);}
-  .drawer-notify{
-    margin-top:auto; border:1px solid var(--line); border-radius:18px; padding:16px;
-    background:rgba(255,59,59,.07);
-    display:flex; align-items:center; justify-content:space-between; gap:12px;
-  }
-  .drawer-notify p{margin:0; font-size:13.5px; color:var(--ink-dim); font-weight:500;}
-  .bell{width:40px; height:40px; border-radius:50%; border:1px solid var(--line); background:var(--panel); display:flex; align-items:center; justify-content:center; flex:none;}
-
-  /* ---------- Section scaffolding ---------- */
-  section{padding:64px 0;}
-  .eyebrow{
-    display:inline-flex; align-items:center; gap:8px; margin:0 auto 14px; padding:6px 16px;
-    border:1px solid rgba(255,59,59,.35); border-radius:999px; background:rgba(255,59,59,.08);
-    color:var(--flame-2); font-weight:700; font-size:12.5px; letter-spacing:1.5px;
-  }
-  .eyebrow svg{width:13px; height:13px;}
-  .head-row{text-align:center; margin-bottom:34px;}
-  .head-row h2{
-    font-size:clamp(32px,7vw,50px); font-weight:800; line-height:1.03; margin:0 0 16px;
-    background:linear-gradient(180deg,#fff, #d9c9c9 55%, var(--flame-1) 130%);
-    -webkit-background-clip:text; background-clip:text; color:transparent;
-  }
-  .divider{
-    width:190px; height:3px; margin:0 auto 22px; border-radius:3px;
-    background:linear-gradient(90deg,transparent, var(--flame-1) 30%, var(--flame-3) 70%, transparent);
-    background-size:220% 100%;
-    animation:flow 3.4s linear infinite;
-  }
-  @keyframes flow{ to{ background-position:-220% 0; } }
-  .pill-btn{
-    display:inline-flex; align-items:center; gap:9px; padding:12px 26px;
-    border:1px solid rgba(255,59,59,.45); border-radius:999px; color:var(--flame-2);
-    font-weight:700; font-size:14px; background:rgba(255,59,59,.05);
-    transition:background .2s ease, transform .2s ease, border-color .2s ease;
-  }
-  .pill-btn:hover{background:rgba(255,59,59,.14); transform:translateY(-1px); border-color:var(--flame-1);}
-  .pill-btn svg{width:15px; height:15px; transition:transform .2s ease;}
-  .pill-btn:hover svg{transform:translateX(3px);}
-
-  /* ---------- Hero ---------- */
-  .hero{
-    min-height:calc(100svh - 100px);
-    padding:76px 0 76px;
-    text-align:center;
-    position:relative;
-    isolation:isolate;
-    display:flex;
-    align-items:center;
-  }
-  .hero::before{
-    content:"";
-    position:absolute;
-    inset:0;
-    z-index:-1;
-    background:
-      linear-gradient(153deg, rgba(112,10,16,.76) 0%, rgba(55,8,12,.55) 40%, rgba(8,7,8,.96) 76%),
-      linear-gradient(rgba(10,10,10,.28) 0%, rgba(10,10,10,.66) 100%);
-  }
-  .hero .wrap{
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    margin-left:auto;
-    margin-right:auto;
-    position:relative;
-    z-index:10;
-    opacity:1;
-    transition:all .2s ease;
-  }
-  .hero .wrap.flex-col{flex-direction:column;}
-  .hero .wrap.items-center{align-items:center;}
-  .hero .wrap.mx-auto{margin-left:auto; margin-right:auto;}
-  .hero .wrap.opacity-100{opacity:1;}
-  .hero .wrap.transition-all{transition:all .2s ease;}
-  .hero .wrap.z-10{z-index:10;}
-  .hero-badge{
-    display:inline-flex; align-items:center; justify-content:center; gap:14px;
-    padding:14px 28px;
-    border:1px solid rgba(229, 9, 20, 0.28);
-    border-radius:999px;
-    background:linear-gradient(135deg, rgba(229, 9, 20, 0.11), rgba(255, 71, 87, 0.035));
-    color:var(--ink);
-    font-size:13px; font-weight:700; letter-spacing:.2em;
-    margin-bottom:54px;
-    transition:transform .2s ease, background .2s ease, border-color .2s ease;
-    opacity:0; animation:rise .7s ease forwards;
-    box-shadow:0 0 28px rgba(255,25,45,.08);
-  }
-  .hero-badge:hover{
-    transform:scale(1.02); /* hover:scale-[1.02] */
-    border-color:rgba(229, 9, 20, 0.38);
-    background:linear-gradient(135deg, rgba(229, 9, 20, 0.12), rgba(255, 71, 87, 0.06));
-  }
-  .hero-badge .dot{width:7px; height:7px; border-radius:50%; background:var(--flame-1); box-shadow:0 0 0 0 rgba(255,59,59,.6); animation:ping 1.8s ease-out infinite;}
-  @keyframes ping{ 0%{box-shadow:0 0 0 0 rgba(255,59,59,.55);} 70%{box-shadow:0 0 0 9px rgba(255,59,59,0);} 100%{box-shadow:0 0 0 0 rgba(255,59,59,0);} }
-
-  .hero h1{
-    margin:0 0 8px;
-    line-height:.96;
-    color:var(--ink);
-  }
-  /* Tailwind-style title utilities: font-black, tracking-tighter, responsive text sizes */
-  .animate-title-reveal{
-    display:inline-block;
-    font-weight:900;
-    font-size:clamp(3.8rem,14vw,6rem);
-    letter-spacing:-.055em;
-    line-height:.92;
-    background:linear-gradient(110deg,#ff2637 5%,#ff5668 52%,#ff283b 100%);
-    -webkit-background-clip:text;
-    background-clip:text;
-    color:transparent;
-    opacity:0;
-    animation:1.2s cubic-bezier(0.77, 0, 0.175, 1) 0s 1 normal forwards running titleReveal;
-  }
-  @media (min-width:640px){
-    .animate-title-reveal{font-size:3.75rem;} /* sm:text-6xl */
-  }
-  @media (min-width:1024px){
-    .animate-title-reveal{font-size:4.5rem;} /* lg:text-7xl */
-  }
-  @media (min-width:1280px){
-    .animate-title-reveal{font-size:6rem;} /* xl:text-8xl */
-  }
-  @keyframes titleReveal{
-    from{opacity:0; transform:translateY(100%);}
-    to{opacity:1; transform:translateY(0);}
-  }
-  .hero .sub{
-    font-family:'Baloo 2'; font-weight:600; font-size:clamp(24px,5vw,34px); color:#e1dadd;
-    margin:34px 0 26px; opacity:0; animation:rise .75s ease .28s forwards;
-  }
-  .hero .sub span{color:var(--flame-2); border-bottom:2px solid var(--flame-1); padding-bottom:1px;}
-  .hero p.desc{
-    max-width:620px; margin:0 auto 72px; color:#a69b9f; font-size:clamp(16px,3.5vw,21px); line-height:1.75;
-    opacity:0; animation:rise .75s ease .36s forwards;
-  }
-  .hero p.desc b{color:var(--ink-dim); font-weight:600;}
-  .hero-actions{display:flex; flex-direction:column; width:min(650px,100%); flex-wrap:wrap; gap:28px; justify-content:center; opacity:0; animation:rise .75s ease .46s forwards;}
-  .btn-primary{
-    display:inline-flex; align-items:center; justify-content:center; gap:16px; padding:24px 30px; border-radius:28px;
-    background:linear-gradient(135deg,#ff101d,#ff4858); color:#fff; font-weight:800; font-size:clamp(18px,4vw,25px);
-    border:none; cursor:pointer;
-    box-shadow:0 14px 34px -12px rgba(255,46,99,.7);
-    transition:transform .2s ease, box-shadow .2s ease;
-  }
-  .btn-primary:hover{transform:translateY(-2px); box-shadow:0 18px 40px -10px rgba(255,46,99,.85);}
-  .btn-primary svg{width:16px; height:16px;}
-  .btn-ghost{
-    display:inline-flex; align-items:center; justify-content:center; padding:24px 30px; border-radius:28px;
-    border:1px solid rgba(255,255,255,.16); color:#e5dfe1; font-weight:700; font-size:clamp(18px,4vw,25px);
-    background:rgba(18,9,10,.35); transition:border-color .2s ease, color .2s ease;
-  }
-  .btn-ghost:hover{border-color:var(--flame-1); color:var(--ink);}
-
-  @keyframes rise{ from{ opacity:0; transform:translateY(16px);} to{ opacity:1; transform:translateY(0);} }
-
-  .hero-stats{
-    display:flex; justify-content:center; gap:clamp(20px,6vw,56px); margin-top:52px; flex-wrap:wrap;
-    opacity:0; animation:rise .75s ease .56s forwards;
-  }
-  .hero-stats .stat b{display:block; font-family:'Baloo 2'; font-size:clamp(22px,4vw,30px); font-weight:800; color:var(--ink);}
-  .hero-stats .stat span{font-size:12px; letter-spacing:1.5px; color:var(--ink-mute); font-weight:600;}
-
-  /* ---------- Cards ---------- */
-  .rail{
-    display:flex; gap:20px; overflow-x:auto; padding:6px 4px 22px; scroll-snap-type:x mandatory;
-    -webkit-overflow-scrolling:touch;
-  }
-  .rail::-webkit-scrollbar{height:0;}
-  .grid-cards{display:grid; grid-template-columns:1fr; gap:20px;}
-  @media (min-width:640px){ .grid-cards{grid-template-columns:repeat(2,1fr);} }
-  @media (min-width:1000px){ .grid-cards{grid-template-columns:repeat(3,1fr);} }
-
-  .card{
-    scroll-snap-align:start; flex:0 0 78vw; max-width:340px;
-    background:linear-gradient(175deg,var(--panel-2),var(--panel));
-    border:1px solid var(--line); border-radius:var(--radius-lg);
-    overflow:hidden; position:relative;
-    opacity:0; transform:translateY(22px);
-    transition:transform .5s cubic-bezier(.2,.8,.2,1), opacity .5s ease, border-color .3s ease, box-shadow .3s ease;
-  }
-  .card.in{opacity:1; transform:translateY(0);}
-  .card:hover{border-color:rgba(255,59,59,.45); box-shadow:0 22px 44px -22px rgba(255,46,99,.55);}
-  @media (min-width:640px){ .card{flex:none; max-width:none; width:auto;} }
-
-  .thumb{
-    position:relative; aspect-ratio:4/3; overflow:hidden;
-    display:flex; align-items:flex-end;
-  }
-  .thumb .art{position:absolute; inset:0;}
-  .thumb .grain{position:absolute; inset:0; opacity:.5; mix-blend-mode:overlay;
-    background-image:radial-gradient(rgba(255,255,255,.12) 1px, transparent 1px);
-    background-size:3px 3px;}
-  .thumb .scan{position:absolute; inset:0; background:repeating-linear-gradient(0deg, rgba(0,0,0,.18) 0 2px, transparent 2px 4px); mix-blend-mode:overlay;}
-  .thumb .vign{position:absolute; inset:0; background:radial-gradient(120% 90% at 50% 100%, rgba(0,0,0,.75), transparent 55%);}
-  .card:hover .art{transform:scale(1.06);}
-  .thumb .art{transition:transform .6s ease;}
-
-  .badge-new{
-    position:absolute; top:14px; left:14px; z-index:3;
-    background:linear-gradient(120deg,#ff2e9c,#ff5b3d);
-    color:#2a0512; font-weight:800; font-size:11px; letter-spacing:1px;
-    padding:6px 12px; border-radius:999px;
-  }
-  .badge-time{
-    position:absolute; top:14px; right:14px; z-index:3;
-    display:flex; align-items:center; gap:6px;
-    background:rgba(10,6,6,.72); backdrop-filter:blur(4px);
-    border:1px solid rgba(255,255,255,.12); color:var(--ink-dim);
-    font-size:11px; font-weight:600; padding:6px 11px; border-radius:999px;
-  }
-  .badge-time svg{width:11px; height:11px;}
-  .thumb .cap{position:relative; z-index:2; padding:16px; width:100%;}
-  .thumb .cap .tag-line{font-size:10.5px; font-weight:700; letter-spacing:3px; color:var(--flame-3); margin-bottom:4px;}
-  .thumb .cap .big{font-family:'Baloo 2'; font-weight:800; font-size:21px; color:#fff; line-height:1.05; text-shadow:0 3px 14px rgba(0,0,0,.6);}
-  .thumb .cap .fmt{margin-top:8px; display:inline-block; font-size:10.5px; letter-spacing:2px; font-weight:700; color:rgba(255,255,255,.75); border:1px solid rgba(255,255,255,.25); padding:3px 9px; border-radius:6px;}
-  .play-hit{
-    position:absolute; inset:0; margin:auto; width:52px; height:52px; z-index:3;
-    border-radius:50%; background:rgba(10,6,6,.55); border:1px solid rgba(255,255,255,.25);
-    display:flex; align-items:center; justify-content:center;
-    opacity:0; transform:scale(.7);
-    transition:opacity .25s ease, transform .25s ease;
-  }
-  .card:hover .play-hit{opacity:1; transform:scale(1);}
-  .play-hit svg{width:18px; height:18px; margin-left:2px; color:#fff;}
-
-  .card-body{padding:18px 18px 20px;}
-  .card-body h3{margin:0 0 8px; font-family:'Inter','Noto Sans Khmer'; font-weight:700; font-size:15.5px; line-height:1.35; color:var(--ink);}
-  .card-body p{margin:0 0 14px; font-size:13px; line-height:1.55; color:var(--ink-mute);
-    display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;}
-  .chip-row{display:flex; gap:8px; flex-wrap:wrap; margin-bottom:14px;}
-  .chip{font-size:11px; font-weight:700; letter-spacing:.4px; padding:6px 12px; border-radius:999px;}
-  .chip.category{background:rgba(255,59,59,.14); color:var(--flame-2); border:1px solid rgba(255,59,59,.3);}
-  .chip.meta{background:var(--panel); color:var(--ink-mute); border:1px solid var(--line);}
-  .card-foot{display:flex; align-items:center; justify-content:space-between; padding-top:14px; border-top:1px solid var(--line);}
-  .view-clip{font-size:12.5px; font-weight:700; letter-spacing:1.5px; color:var(--ink-mute); display:flex; align-items:center; gap:8px;}
-  .view-clip .arrow{width:30px; height:30px; border-radius:50%; background:rgba(255,59,59,.12); border:1px solid rgba(255,59,59,.3); display:flex; align-items:center; justify-content:center; transition:background .2s ease, transform .2s ease;}
-  .view-clip .arrow svg{width:13px; height:13px; color:var(--flame-2);}
-  .card:hover .view-clip .arrow{background:var(--flame-1); transform:translateX(3px);}
-  .card:hover .view-clip .arrow svg{color:#1a0505;}
-
-  /* ---------- Explore ---------- */
-  .search-wrap{max-width:560px; margin:0 auto 28px; position:relative;}
-  .search-wrap input{
-    width:100%; padding:17px 20px 17px 52px; border-radius:999px;
-    background:var(--panel); border:1px solid var(--line); color:var(--ink); font-size:14.5px; font-weight:500;
-    transition:border-color .2s ease, background .2s ease;
-  }
-  .search-wrap input::placeholder{color:var(--ink-mute);}
-  .search-wrap input:focus{border-color:var(--flame-1); background:var(--panel-2);}
-  .search-wrap svg{position:absolute; left:20px; top:50%; transform:translateY(-50%); width:18px; height:18px; color:var(--flame-1);}
-
-  .filter-row{display:flex; flex-wrap:wrap; gap:10px; justify-content:center; margin-bottom:8px;}
-  .filter-chip{
-    padding:11px 20px; border-radius:999px; font-size:13.5px; font-weight:700;
-    border:1px solid var(--line); background:var(--panel); color:var(--ink-dim); cursor:pointer;
-    transition:all .22s ease;
-  }
-  .filter-chip:hover{border-color:rgba(255,59,59,.4); color:var(--ink);}
-  .filter-chip.active{
-    background:linear-gradient(120deg,var(--flame-1),var(--spark)); color:#1a0505; border-color:transparent;
-    box-shadow:0 10px 22px -10px rgba(255,46,99,.7);
-  }
-
-  /* ---------- Footer ---------- */
-  footer{border-top:1px solid var(--line); padding:44px 0 calc(34px + env(safe-area-inset-bottom,0px)); margin-top:20px;}
-  .foot-row{display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:20px;}
-  .foot-links{display:flex; gap:22px; flex-wrap:wrap; font-size:13.5px; font-weight:600; color:var(--ink-mute);}
-  .foot-links a:hover{color:var(--flame-2);}
-  .foot-note{font-size:12.5px; color:var(--ink-mute); margin-top:22px; text-align:center;}
-
-  .reveal{opacity:0; transform:translateY(18px); transition:opacity .6s ease, transform .6s ease;}
-  .reveal.in{opacity:1; transform:translateY(0);}
-
-  /* ---------- File host: upload + library ---------- */
-  .lede{color:var(--ink-mute); font-size:15px; line-height:1.7; max-width:560px; margin:0 auto 18px;}
-  .panel{max-width:920px; margin:0 auto; padding:clamp(18px,4vw,34px); background:linear-gradient(175deg,var(--panel-2),var(--panel)); border:1px solid var(--line); border-radius:var(--radius-lg);}
-  input[type=file]{display:none;}
-  .drop{display:flex; align-items:center; justify-content:center; min-height:230px; padding:28px 20px; text-align:center; cursor:pointer; border:1.5px dashed rgba(255,59,59,.42); border-radius:var(--radius-md); background:rgba(255,59,59,.04); transition:border-color .2s ease, background .2s ease, transform .2s ease;}
-  .drop:hover,.drop.drag{border-color:var(--flame-1); background:rgba(255,59,59,.1);}
-  .drop.drag{transform:scale(1.01);}
-  .drop-icon{width:64px; height:64px; margin:0 auto 16px; display:flex; align-items:center; justify-content:center; border-radius:50%; border:1px solid rgba(255,59,59,.35); background:rgba(255,59,59,.1); color:var(--flame-2);}
-  .drop-icon svg{width:28px; height:28px;}
-  .drop-label{font-family:'Baloo 2','Noto Sans Khmer',sans-serif; font-weight:700; font-size:19px;}
-  .drop-hint{margin-top:8px; font-size:12.5px; color:var(--ink-mute);}
-  .queue{margin-top:24px;}
-  .queue:empty{display:none;}
-  .genre-hidden{display:none !important;}
-
-  .thumb.q-thumb,.thumb.cloud-visual{align-items:center; justify-content:center; cursor:pointer; font-size:46px; background:linear-gradient(135deg,#2a1013,#120809);}
-  .thumb .media{position:absolute; inset:0; width:100%; height:100%; object-fit:cover; background:#0b0708; transition:transform .6s ease;}
-  .card:hover .thumb .media{transform:scale(1.06);}
-  .play-hit{pointer-events:none;}
-  .play-hit.always{opacity:1; transform:scale(1);}
-  .waveform{position:absolute; inset:0; display:flex; align-items:center; justify-content:center; gap:4px; padding:20px; background:radial-gradient(circle at 50% 45%, rgba(255,59,88,.35), transparent 65%), linear-gradient(145deg,#2a1013,#0d0809);}
-  .waveform i{width:4px; border-radius:99px; background:linear-gradient(var(--flame-3),var(--flame-1)); animation:wave 1.1s ease-in-out infinite alternate;}
-  .waveform i:nth-child(2n){animation-delay:-.25s;}
-  .waveform i:nth-child(3n){animation-delay:-.5s;}
-  @keyframes wave{from{height:18%;} to{height:78%;}}
-
-  .badge-size,.q-badge{position:absolute; top:14px; left:14px; z-index:4; font-size:11px; font-weight:800; letter-spacing:1px; padding:6px 12px; border-radius:999px; white-space:nowrap;}
-  .badge-size{z-index:3; background:rgba(10,6,6,.72); backdrop-filter:blur(4px); border:1px solid rgba(255,255,255,.12); color:var(--ink-dim);}
-  .badge-ready{background:rgba(10,6,6,.72); border:1px solid rgba(255,255,255,.12); color:var(--ink-dim);}
-  .badge-uploading{background:linear-gradient(120deg,var(--flame-1),var(--spark)); color:#1a0505;}
-  .badge-done{background:#f8f6f6; color:#150707;}
-  .badge-error{background:rgba(255,59,59,.22); border:1px solid rgba(255,59,59,.5); color:#ffb0b0;}
-  .fab,.q-del{position:absolute; top:12px; right:12px; z-index:4; width:34px; height:34px; padding:0; border-radius:50%; display:flex; align-items:center; justify-content:center; background:rgba(10,6,6,.72); backdrop-filter:blur(4px); border:1px solid rgba(255,255,255,.14); color:var(--ink-dim); cursor:pointer; font-size:14px; transition:background .2s ease, color .2s ease, border-color .2s ease;}
-  .fab svg{width:15px; height:15px;}
-  .fab:hover{background:var(--flame-1); color:#1a0505; border-color:transparent;}
-  .q-del:hover{border-color:var(--flame-1); color:var(--flame-2);}
-  .q-del:disabled{opacity:.3; cursor:not-allowed;}
-
-  .q-item.done{border-color:rgba(248,246,246,.45);}
-  .q-item.errored{border-color:rgba(255,59,59,.6);}
-  .q-name-input{width:100%; padding:11px 14px; border-radius:12px; background:var(--bg); border:1px solid var(--line); color:var(--ink); font:inherit; font-size:13.5px; font-weight:600;}
-  .q-name-input:focus{outline:none; border-color:var(--flame-1);}
-  .q-meta{margin-top:10px; font-size:12px; color:var(--ink-mute);}
-  .q-url-row{display:flex; align-items:center; gap:8px; margin-top:12px;}
-  .q-url{min-width:0; flex:1; padding:8px 12px; border-radius:10px; background:var(--bg); border:1px solid var(--line); color:var(--ink-dim); font-family:'JetBrains Mono',monospace; font-size:10.5px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
-  .q-prog{display:none; position:absolute; left:0; right:0; bottom:0; height:4px; background:rgba(255,255,255,.08);}
-  .q-bar{height:100%; width:0; background:linear-gradient(90deg,var(--flame-1),var(--flame-3)); transition:width .12s linear;}
-  .q-item.uploading .q-prog{display:block;}
-  .file-card .card-body h3{white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
-  .file-card .card-foot{gap:10px;}
-  .file-card .card-foot .mini-btn{flex:1;}
-
-  .mini-btn{display:inline-flex; align-items:center; justify-content:center; gap:6px; padding:9px 16px; border-radius:999px; border:1px solid var(--line); background:var(--panel); color:var(--ink-dim); font-size:12.5px; font-weight:700; cursor:pointer; transition:border-color .2s ease, color .2s ease, background .2s ease;}
-  .mini-btn:hover{border-color:rgba(255,59,59,.45); color:var(--ink); background:rgba(255,59,59,.1);}
-  .mini-btn.danger{color:#ffb0b0; border-color:rgba(255,59,59,.35);}
-  .mini-btn.danger:hover{background:rgba(255,59,59,.2); border-color:var(--flame-1);}
-  .mini-btn:disabled{opacity:.4; cursor:not-allowed;}
-  .q-copy{flex:none;}
-
-  .actions{display:flex; flex-wrap:wrap; gap:12px; margin-top:24px;}
-  .btn-upload{flex:1; min-width:200px; padding:17px 26px; border:none; border-radius:999px; background:linear-gradient(135deg,#ff101d,#ff4858); color:#fff; font-weight:800; font-size:16px; cursor:pointer; box-shadow:0 14px 34px -14px rgba(255,46,99,.75); transition:transform .2s ease, box-shadow .2s ease;}
-  .btn-upload:hover:not(:disabled){transform:translateY(-2px); box-shadow:0 18px 40px -12px rgba(255,46,99,.85);}
-  .btn-upload:disabled{opacity:.4; cursor:not-allowed;}
-  .btn-clear{padding:17px 26px; border-radius:999px; border:1px solid rgba(255,255,255,.16); background:rgba(18,9,10,.35); color:#e5dfe1; font-weight:700; font-size:15px; cursor:pointer; transition:border-color .2s ease, color .2s ease;}
-  .btn-clear:hover{border-color:var(--flame-1); color:var(--ink);}
-  .error{display:none; margin-top:16px; padding:13px 16px; border:1px solid rgba(255,59,59,.4); border-radius:var(--radius-md); background:rgba(255,59,59,.09); color:#ffb0b0; font-size:13.5px;}
-  .error.show{display:block;}
-  .panel-foot{margin-top:24px; text-align:center; font-size:12px; color:var(--ink-mute);}
-
-  .cloud-empty{grid-column:1/-1; padding:44px 16px; text-align:center; color:var(--ink-mute); border:1px dashed var(--line); border-radius:var(--radius-md); font-size:14px;}
-  .danger-btn{margin:30px auto 0; padding:13px 24px; border-radius:999px; border:1px solid rgba(255,59,59,.4); background:rgba(255,59,59,.08); color:#ffb0b0; font-weight:700; font-size:13.5px; cursor:pointer; transition:background .2s ease, border-color .2s ease;}
-  .danger-btn:hover{background:rgba(255,59,59,.2); border-color:var(--flame-1);}
-
-  .preview-modal{display:none; position:fixed; inset:0; z-index:200; align-items:center; justify-content:center; padding:20px; background:rgba(6,3,3,.88); backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px);}
-  .preview-modal.open{display:flex;}
-  .preview-inner{position:relative; display:flex; align-items:center; justify-content:center; max-width:min(860px,100%); max-height:88vh; overflow:hidden; border-radius:var(--radius-lg); background:var(--panel); border:1px solid var(--line); box-shadow:0 40px 100px rgba(0,0,0,.7);}
-  .preview-inner img,.preview-inner video,.preview-inner audio{display:block; max-width:100%; max-height:85vh; object-fit:contain;}
-  .preview-inner audio{min-width:280px; padding:30px;}
-  .preview-close{position:absolute; top:calc(14px + env(safe-area-inset-top,0px)); right:16px; width:42px; height:42px; border-radius:50%; border:1px solid var(--line); background:var(--panel); color:var(--ink); cursor:pointer; font-size:16px; line-height:1; transition:background .2s ease, color .2s ease;}
-  .preview-close:hover{background:var(--flame-1); color:#1a0505;}
+/* Media poster enhancements */
+.q-thumb,.cloud-visual{position:relative}
+.media-play{position:absolute;top:50%;left:50%;width:48px;height:48px;display:grid;place-items:center;transform:translate(-50%,-50%);border:1px solid rgba(255,255,255,.75);border-radius:50%;color:#111;background:rgba(255,255,255,.92);font-size:20px;box-shadow:0 8px 24px #0008;pointer-events:none}
+.waveform{width:100%;height:100%;display:flex;align-items:center;justify-content:center;gap:4px;padding:20px;background:radial-gradient(circle at 50% 45%,#555,transparent 65%),linear-gradient(145deg,#2c2e36,#0b0c10)}
+.waveform i{width:4px;border-radius:99px;background:linear-gradient(#fff,#777);animation:wave 1.1s ease-in-out infinite alternate}
+.waveform i:nth-child(2n){animation-delay:-.25s}.waveform i:nth-child(3n){animation-delay:-.5s}
+@keyframes wave{from{height:18%}to{height:78%}}
+.genre-tabs{display:flex;gap:8px;flex-wrap:wrap;margin-top:18px}
+.genre-tab{padding:8px 12px;border:1px solid var(--line);border-radius:999px;color:#999da7;background:#111318;cursor:pointer;font-size:11px;font-weight:800}
+.genre-tab.active,.genre-tab:hover{color:#080808;background:#fff;border-color:#fff}
+.genre-hidden{display:none!important}
+.cloud-visual{position:relative;overflow:hidden;cursor:pointer}
+.cloud-visual img,.cloud-visual video,.q-thumb img,.q-thumb video{width:100%;height:100%;display:block;object-fit:cover;object-position:center;background:#090a0d}
+.cloud-visual .waveform,.q-thumb .waveform{height:100%}
+.cloud-visual .media-play{width:44px;height:44px}
+.cloud-actions{display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+.cloud-copy{width:auto;min-height:unset;padding:6px 10px;font-size:10px;display:flex;align-items:center;justify-content:center;border:1px solid var(--line-bright);border-radius:9px;color:#c6c8ce;background:transparent;cursor:pointer}
+.cloud-copy:hover,.cloud-copy-fab:hover{color:#080808;background:#fff}
+.cloud-copy-fab{display:flex;align-items:center;justify-content:center;border:1px solid var(--line-bright);color:#c6c8ce;cursor:pointer;font-size:13px;z-index:2}
+.cloud-item .cloud-open,.cloud-item .cloud-delete{flex:1;min-height:36px}
+.q-name-input{width:100%;border:1px solid var(--line);border-radius:8px;padding:7px 9px;color:#fff;background:#090a0d;outline:none;font-size:13px}
+.q-name-input:focus{border-color:#fff;box-shadow:0 0 16px rgba(255,255,255,.12)}
+@media(max-width:480px){
+  .queue,.cloud-list{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+  .q-item,.cloud-item{min-height:246px;padding:10px;border-radius:15px;gap:9px}
+  .q-thumb,.cloud-visual,.cloud-icon{aspect-ratio:3/4;height:auto;min-height:140px;border-radius:10px}
+  .q-name,.cloud-name{font-size:12px}.q-meta,.cloud-meta{font-size:9px}
+  .q-del,.cloud-copy-fab{top:8px;right:8px;width:27px;height:27px}
+  .q-url{font-size:8px;padding:5px}.q-copy{padding:5px 6px;font-size:9px}
+  .cloud-open,.cloud-delete{min-height:30px;padding:6px 4px;font-size:9px}
+}
 </style>
 </head>
+
 <body>
+<div class="site-shell">
+  <header class="topbar">
+    <a class="brand" href="#upload"><span class="brand-mark">U</span><span>UNiFY</span></a>
+    <nav class="main-nav" aria-label="Main menu"><a class="active" href="#upload">Upload</a><a href="#library">R2 Library</a></nav>
+  </header>
 
-<header class="site">
-  <div class="nav-shell">
-    <a href="#top" class="brand">
-      <svg class="brand-mark" viewBox="0 0 48 48" fill="none">
-        <path d="M8 6h20l-9 15h11L15 42l4-16H9L8 6z" fill="url(#g1)"/>
-        <defs><linearGradient id="g1" x1="8" y1="6" x2="30" y2="42" gradientUnits="userSpaceOnUse">
-          <stop stop-color="#ff8a3d"/><stop offset="1" stop-color="#ff2e63"/>
-        </linearGradient></defs>
-      </svg>
-      <span class="brand-text">
-        <span class="k1">RONINFX</span>
-        <span class="k2">TWIXTORS</span>
-      </span>
-    </a>
-
-    <nav class="nav-links">
-      <a href="#top" class="on">Home</a>
-      <a href="#upload">Upload</a>
-      <a href="#library">Library</a>
-      <a href="#recent">Recent</a>
-      <a href="#explore">Explore</a>
-      <a href="#faq">FAQ</a>
-      <a href="#about">About</a>
-    </nav>
-
-    <button class="nav-cta">
-      Get Access
-    </button>
-
-    <button class="burger" id="burgerBtn" aria-label="Open menu" aria-expanded="false">
-      <span></span>
-    </button>
-  </div>
-</header>
-
-<div class="scrim" id="scrim"></div>
-<aside class="drawer" id="drawer" aria-hidden="true">
-  <div class="drawer-top">
-    <span class="brand-text"><span class="k1" style="font-size:17px;">RONINFX TWIXTORS</span></span>
-    <button class="drawer-close" id="drawerClose" aria-label="Close menu">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
-    </button>
-  </div>
-  <a href="#top" class="item active">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 11.5 12 4l8 7.5M6 10v9h5v-5h2v5h5v-9"/></svg>
-    Home
-  </a>
-  <a href="#upload" class="item">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 16V4M7 9l5-5 5 5M4 20h16"/></svg>
-    Upload
-  </a>
-  <a href="#library" class="item">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/></svg>
-    Library
-  </a>
-  <a href="#explore" class="item">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
-    Explore
-  </a>
-  <a href="#recent" class="item">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.5 12a8.5 8.5 0 1 1-2.6-6.1M20.5 4v5h-5"/></svg>
-    Recently Added
-  </a>
-  <a href="#faq" class="item">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 1 1 3.5 2.3c-.9.4-1.5 1-1.5 2.2M12 17h.01"/></svg>
-    FAQ
-  </a>
-  <a href="#about" class="item">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 11v5.5M12 7.5h.01"/></svg>
-    About
-  </a>
-
-  <div class="drawer-notify">
-    <p>Get notified about new drops</p>
-    <span class="bell">
-      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>
-    </span>
-  </div>
-</aside>
-
+<!-- Full preview modal -->
 <div class="preview-modal" id="previewModal" role="dialog" aria-modal="true">
   <div class="preview-inner" id="previewInner"></div>
-  <button class="preview-close" id="previewClose" title="បិទ" aria-label="Close">✕</button>
+  <button class="preview-close" id="previewClose" title="បិទ">✕</button>
 </div>
 
-<main id="top">
+<main class="page-grid" id="upload">
+<section class="card">
 
-  <!-- HERO -->
-  <section class="hero">
-    <div class="wrap flex-col items-center mx-auto opacity-100 transition-all z-10">
-      <span class="hero-badge"><span class="dot"></span> INSTANT DOWNLOAD</span>
-      <h1>
-        <span class="animate-title-reveal">Premium<br> Twixtors</span>
-      </h1>
-      <p class="sub">Twixtor Packs <span>For Video Editors</span></p>
-      <p class="desc">High-quality slow motion clips. <b>4K resolution, 60fps</b>, ready to download.</p>
-      <div class="hero-actions">
-        <button class="btn-primary">
-          Browse Collection
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
-        </button>
-        <a href="#faq" class="btn-ghost">Learn More</a>
-      </div>
-      <div class="hero-stats">
-        <div class="stat"><b>1,240+</b><span>SCENE PACKS</span></div>
-        <div class="stat"><b>4K/60</b><span>MAX QUALITY</span></div>
-        <div class="stat"><b>18K</b><span>EDITORS SERVED</span></div>
-      </div>
-    </div>
-  </section>
-
-  <!-- UPLOAD -->
-  <section id="upload">
-    <div class="wrap">
-      <div class="head-row reveal">
-        <span class="eyebrow">
-          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2s-6 5.5-6 11a6 6 0 0 0 12 0c0-1.7-.8-3-1.6-4.2.2 1.6-.5 2.6-1.4 2.6-1.4 0-1.3-1.6-.8-2.8.7-1.6.1-3.6-2.2-6.6z"/></svg>
-          Cloudflare R2
-        </span>
-        <h2>Upload Files</h2>
-        <div class="divider"></div>
-        <p class="lede">Upload ឯកសារទៅ Cloudflare R2 · Max 500 MB ក្នុងមួយឯកសារ</p>
-        <div class="filter-row" id="genreTabs">
-          <button class="filter-chip genre-tab active" data-genre="all">ALL</button>
-          <button class="filter-chip genre-tab" data-genre="image">IMAGES</button>
-          <button class="filter-chip genre-tab" data-genre="video">VIDEOS</button>
-          <button class="filter-chip genre-tab" data-genre="audio">MUSIC</button>
-          <button class="filter-chip genre-tab" data-genre="other">FILES</button>
-        </div>
-      </div>
-      <div class="panel">
-        <label class="drop" id="drop">
-          <input id="fileInput" type="file" multiple>
-          <div>
-            <div class="drop-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4M7 9l5-5 5 5"/><path d="M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3"/></svg></div>
-            <div class="drop-label">ចុច ឬ ទាញ​ឯកសារ​មកទីនេះ</div>
-            <div class="drop-hint">រូបភាព · វីដេអូ · អូឌីយ៉ូ · PDF · ZIP · Code · Max 500 MB</div>
-          </div>
-        </label>
-        <div class="queue grid-cards" id="queue"></div>
-        <div class="actions" id="actions" style="display:none">
-          <button class="btn-upload" id="uploadBtn">⬆ Upload ឯកសារ</button>
-          <button class="btn-clear" id="clearAllBtn">🗑 លុបទាំងអស់</button>
-        </div>
-        <div class="error" id="errorBox"></div>
-        <div class="panel-foot">Powered by UNiFY CODE · Cloudflare R2</div>
-      </div>
-    </div>
-  </section>
-
-  <!-- LIBRARY -->
-  <section id="library">
-    <div class="wrap">
-      <div class="head-row reveal">
-        <h2>R2 Cloud<br>Library</h2>
-        <div class="divider"></div>
-        <p class="lede">ឯកសារដែលរក្សាទុកក្នុង Cloudflare R2</p>
-        <span class="chip meta" id="cloudCount">0 files</span>
-      </div>
-      <div class="grid-cards cloud-list" id="cloudList"><div class="cloud-empty">កំពុងផ្ទុកឯកសារ...</div></div>
-      <button class="danger-btn" id="deleteAllCloudBtn" style="display:none">🗑 លុបឯកសារទាំងអស់ពី R2</button>
-    </div>
-  </section>
-
-  <!-- RECENTLY ADDED -->
-  <section id="recent">
-    <div class="wrap">
-      <div class="head-row reveal">
-        <h2>Recently<br>Added</h2>
-        <div class="divider"></div>
-        <a href="#explore" class="pill-btn">View All
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
-        </a>
-      </div>
-    </div>
-    <div class="wrap">
-      <div class="rail" id="recentRail"></div>
-    </div>
-  </section>
-
-  <!-- FEATURED -->
-  <section id="featured">
-    <div class="wrap">
-      <div class="head-row reveal">
-        <h2>Featured<br>Clips</h2>
-        <div class="divider"></div>
-        <a href="#explore" class="pill-btn">View All
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
-        </a>
-      </div>
-      <div class="grid-cards" id="featuredGrid"></div>
-    </div>
-  </section>
-
-  <!-- EXPLORE -->
-  <section id="explore">
-    <div class="wrap">
-      <div class="head-row reveal">
-        <span class="eyebrow">
-          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2s-6 5.5-6 11a6 6 0 0 0 12 0c0-1.7-.8-3-1.6-4.2.2 1.6-.5 2.6-1.4 2.6-1.4 0-1.3-1.6-.8-2.8.7-1.6.1-3.6-2.2-6.6z"/></svg>
-          Most Popular
-        </span>
-        <h2>Explore Clips</h2>
-        <p style="color:var(--ink-mute); font-size:15px; max-width:420px; margin:0 auto 30px;">Search the full catalog by title, character or franchise.</p>
-        <div class="search-wrap">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
-          <input type="text" id="searchInput" placeholder="Search for clips, characters, or tags…">
-        </div>
-        <div class="filter-row" id="filterRow"></div>
-      </div>
-      <div class="grid-cards" id="exploreGrid"></div>
-    </div>
-  </section>
-
-  <!-- FAQ / ABOUT (lightweight anchors) -->
-  <section id="faq">
-    <div class="wrap">
-      <div class="head-row reveal">
-        <h2>Quick<br>Answers</h2>
-        <div class="divider"></div>
-      </div>
-      <div class="grid-cards" style="grid-template-columns:repeat(auto-fit,minmax(260px,1fr));">
-        <div class="card in" style="padding:24px;">
-          <h3 style="margin:0 0 8px; font-weight:700; font-size:16px;">What formats are included?</h3>
-          <p style="color:var(--ink-mute); font-size:13.5px; line-height:1.6; margin:0;">Every pack ships as 4K ProRes and H.264, retimed and ready for Premiere, Resolve or After Effects.</p>
-        </div>
-        <div class="card in" style="padding:24px;">
-          <h3 style="margin:0 0 8px; font-weight:700; font-size:16px;">Can I use clips commercially?</h3>
-          <p style="color:var(--ink-mute); font-size:13.5px; line-height:1.6; margin:0;">Edits for personal channels and fan content are covered — check each pack's license note for commercial jobs.</p>
-        </div>
-        <div class="card in" style="padding:24px;">
-          <h3 style="margin:0 0 8px; font-weight:700; font-size:16px;">How often do you post?</h3>
-          <p style="color:var(--ink-mute); font-size:13.5px; line-height:1.6; margin:0;">New scene packs land every few days — turn on notifications so you don't miss a drop.</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section id="about">
-    <div class="wrap">
-      <div class="head-row reveal" style="max-width:640px; margin-left:auto; margin-right:auto;">
-        <h2>Built by editors,<br>for editors.</h2>
-        <p style="color:var(--ink-mute); font-size:15px; line-height:1.7;">Katana Reels started as a personal stash of remapped footage for a weekend edit — it grew into a library the whole community leans on for clean, ready-to-cut motion.</p>
-      </div>
-    </div>
-  </section>
-
-</main>
-
-<footer>
-  <div class="wrap">
-    <div class="foot-row">
-      <a href="#top" class="brand">
-        <svg class="brand-mark" viewBox="0 0 48 48" fill="none" style="width:30px;height:30px;">
-          <path d="M8 6h20l-9 15h11L15 42l4-16H9L8 6z" fill="url(#g2)"/>
-          <defs><linearGradient id="g2" x1="8" y1="6" x2="30" y2="42" gradientUnits="userSpaceOnUse">
-            <stop stop-color="#ff8a3d"/><stop offset="1" stop-color="#ff2e63"/>
-          </linearGradient></defs>
-        </svg>
-        <span class="brand-text"><span class="k1" style="font-size:16px;">RONINFX TWIXTORS</span></span>
-      </a>
-      <div class="foot-links">
-        <a href="#upload">Upload</a>
-        <a href="#library">Library</a>
-        <a href="#recent">Recently Added</a>
-        <a href="#explore">Explore</a>
-        <a href="#faq">FAQ</a>
-        <a href="#about">About</a>
-        <a href="#top">Policy</a>
-      </div>
-    </div>
-    <p class="foot-note">© 2026 Katana Reels · Sample scene-pack library UI · All clip artwork is generated placeholder art.</p>
+  <div class="header">
+    <h1>UNiFY File Host</h1>
+    <p>Upload ឯកសារទៅ Cloudflare R2 · Max 500 MB ក្នុងមួយឯកសារ</p><div class="genre-tabs" id="genreTabs"><button class="genre-tab active" data-genre="all">All</button><button class="genre-tab" data-genre="image">Images</button><button class="genre-tab" data-genre="video">Videos</button><button class="genre-tab" data-genre="audio">Music</button><button class="genre-tab" data-genre="other">Files</button></div>
   </div>
-</footer>
 
-<script>
-(function(){
-  // ---------- Data ----------
-  const CATS = ["All","Chase","Combat","Sci-Fi","Racing","Anime","Duel","Storm","Neon"];
-  const clips = [
-    {title:"Midnight Pursuit — Rooftop Chase", cat:"Chase", fmt:"4K · 60fps", tagline:"CINEMATIC", time:"2D AGO", isNew:true, desc:"A rain-soaked rooftop chase remapped for buttery slow motion, stabilized frame by frame.", hue:["#ff3b3b","#ff8a3d"]},
-    {title:"Iron Duel — Arena Finale", cat:"Combat", fmt:"4K · 60fps", tagline:"SLOW-MO", time:"3D AGO", isNew:true, desc:"Two fighters trade blows under stadium lights — every impact frame held for maximum drama.", hue:["#7b2ff7","#ff2e63"]},
-    {title:"Vector Drift — Night Circuit", cat:"Racing", fmt:"4K · 50fps", tagline:"MOTION", time:"5D AGO", isNew:false, desc:"Neon-lit drift sequence with tracked headlight trails, ready for a montage cut.", hue:["#00c2ff","#7b2ff7"]},
-    {title:"Void Walker — Portal Break", cat:"Sci-Fi", fmt:"4K · 60fps", tagline:"VFX PACK", time:"6D AGO", isNew:true, desc:"A portal collapse sequence with particle debris, perfect for a trailer sting.", hue:["#ff8a3d","#ffb020"]},
-    {title:"Crimson Blade — Dojo Sparring", cat:"Duel", fmt:"4K · 48fps", tagline:"ANIME FX", time:"1W AGO", isNew:false, desc:"Hand-inked style sparring match with speed-line overlays baked into the remap.", hue:["#ff2e63","#ff3b3b"]},
-    {title:"Static Fury — Storm Landing", cat:"Storm", fmt:"4K · 60fps", tagline:"IMPACT", time:"1W AGO", isNew:false, desc:"A lightning-charged landing shot with shockwave dust for maximum punch on the beat drop.", hue:["#ffb020","#ff3b3b"]},
-  ];
-  const feats = [
-    {title:"Neon Requiem — Final Stand", cat:"Sci-Fi", fmt:"4K · 60fps", tagline:"FEATURED", time:"6MO AGO", isNew:false, desc:"A synth-drenched showdown remapped from source footage for a flawless slow build.", hue:["#00c2ff","#ff2e63"]},
-    {title:"Hollow Fang — Ambush Sequence", cat:"Combat", fmt:"4K · 60fps", tagline:"FEATURED", time:"6MO AGO", isNew:false, desc:"Fast cuts blended into liquid-smooth motion for an ambush reveal that hits hard.", hue:["#ff3b3b","#7b2ff7"]},
-    {title:"Glass City — Getaway Run", cat:"Chase", fmt:"4K · 60fps", tagline:"FEATURED", time:"5MO AGO", isNew:false, desc:"A glass-and-chrome getaway sequence remapped for a slow-motion hero moment.", hue:["#ffb020","#ff8a3d"]},
-  ];
+  <!-- Drop zone -->
+  <label class="drop" id="drop">
+    <input id="fileInput" type="file" multiple>
+    <div>
+      <div class="drop-icon">☁️</div>
+      <div class="drop-label">ចុច ឬ ទាញ​ឯកសារ​មកទីនេះ</div>
+      <div class="drop-hint">រូបភាព · វីដេអូ · អូឌីយ៉ូ · PDF · ZIP · Code · Max 500 MB</div>
+    </div>
+  </label>
 
-  function svgArt(hue){
-    return `background:
-      radial-gradient(120% 90% at 15% 10%, rgba(255,255,255,.16), transparent 45%),
-      linear-gradient(135deg, ${hue[0]}, ${hue[1]});`;
-  }
+  <!-- File queue -->
+  <div class="queue" id="queue"></div>
 
-  function card(c, idx){
-    return `
-    <article class="card" data-cat="${c.cat}" style="animation-delay:${idx*60}ms;">
-      <div class="thumb" style="${svgArt(c.hue)}">
-        <div class="art" style="${svgArt(c.hue)}"></div>
-        <div class="grain"></div>
-        <div class="scan"></div>
-        <div class="vign"></div>
-        ${c.isNew ? '<span class="badge-new">NEW</span>' : ''}
-        <span class="badge-time">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
-          ${c.time}
-        </span>
-        <span class="play-hit"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></span>
-        <div class="cap">
-          <div class="tag-line">${c.tagline}</div>
-          <div class="big">${c.title.split(' — ')[0]}</div>
-          <span class="fmt">${c.fmt}</span>
-        </div>
-      </div>
-      <div class="card-body">
-        <h3>${c.title}</h3>
-        <p>${c.desc}</p>
-        <div class="chip-row">
-          <span class="chip category">${c.cat.toUpperCase()}</span>
-          <span class="chip meta">${c.fmt}</span>
-        </div>
-        <div class="card-foot">
-          <span style="font-size:12px; color:var(--ink-mute); font-weight:600;">${c.time}</span>
-          <span class="view-clip">VIEW CLIP <span class="arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></span></span>
-        </div>
-      </div>
-    </article>`;
-  }
+  <!-- Action buttons -->
+  <div class="actions" id="actions" style="display:none">
+    <button class="btn-primary" id="uploadBtn">⬆ Upload ឯកសារ</button>
+    <button class="btn-clear" id="clearAllBtn">🗑 លុបទាំងអស់</button>
+  </div>
 
-  document.getElementById('recentRail').innerHTML = clips.map(card).join('');
-  document.getElementById('featuredGrid').innerHTML = feats.map(card).join('');
-  document.getElementById('exploreGrid').innerHTML = clips.concat(feats).map(card).join('');
+  <div class="error" id="errorBox"></div>
 
-  document.getElementById('filterRow').innerHTML = CATS.map((c,i)=>
-    `<button class="filter-chip ${i===0?'active':''}" data-filter="${c}">${c.toUpperCase()}</button>`
-  ).join('');
+  <div class="footer">Powered by UNiFY CODE · Cloudflare R2</div>
+</section>
 
-  // ---------- Filtering ----------
-  const exploreGrid = document.getElementById('exploreGrid');
-  document.getElementById('filterRow').addEventListener('click', (e)=>{
-    const btn = e.target.closest('.filter-chip');
-    if(!btn) return;
-    document.querySelectorAll('#filterRow .filter-chip').forEach(b=>b.classList.remove('active'));
-    btn.classList.add('active');
-    const f = btn.dataset.filter;
-    exploreGrid.querySelectorAll('.card').forEach(card=>{
-      const show = f === 'All' || card.dataset.cat === f;
-      card.style.display = show ? '' : 'none';
-    });
-  });
+<section class="cloud-panel" id="library">
+  <div class="panel-heading">
+    <div><h2>R2 Cloud Library</h2><p>ឯកសារដែលរក្សាទុកក្នុង Cloudflare R2</p></div>
+    <span class="cloud-count" id="cloudCount">0 files</span>
+  </div>
+  <div class="cloud-list" id="cloudList"><div class="cloud-empty">កំពុងផ្ទុកឯកសារ...</div></div>
+  <button class="danger-button" id="deleteAllCloudBtn" style="display:none;margin-top:14px;width:100%">🗑 លុបឯកសារទាំងអស់ពី R2</button>
+</section>
+</main>
+</div>
 
-  document.getElementById('searchInput').addEventListener('input', (e)=>{
-    const q = e.target.value.trim().toLowerCase();
-    exploreGrid.querySelectorAll('.card').forEach(card=>{
-      const text = card.textContent.toLowerCase();
-      card.style.display = text.includes(q) ? '' : 'none';
-    });
-  });
-
-  // ---------- Drawer ----------
-  const drawer = document.getElementById('drawer');
-  const scrim = document.getElementById('scrim');
-  const burgerBtn = document.getElementById('burgerBtn');
-  const drawerClose = document.getElementById('drawerClose');
-  function openDrawer(){ drawer.classList.add('open'); scrim.classList.add('show'); drawer.setAttribute('aria-hidden','false'); burgerBtn.setAttribute('aria-expanded','true'); document.body.style.overflow='hidden'; }
-  function closeDrawer(){ drawer.classList.remove('open'); scrim.classList.remove('show'); drawer.setAttribute('aria-hidden','true'); burgerBtn.setAttribute('aria-expanded','false'); document.body.style.overflow=''; }
-  burgerBtn.addEventListener('click', openDrawer);
-  drawerClose.addEventListener('click', closeDrawer);
-  scrim.addEventListener('click', closeDrawer);
-  drawer.querySelectorAll('a').forEach(a=>a.addEventListener('click', closeDrawer));
-
-  // ---------- Scroll reveal ----------
-  const io = new IntersectionObserver((entries)=>{
-    entries.forEach(entry=>{
-      if(entry.isIntersecting){
-        entry.target.classList.add('in');
-        io.unobserve(entry.target);
-      }
-    });
-  }, {threshold:.15});
-
-  document.querySelectorAll('.card, .reveal').forEach(el=> io.observe(el));
-})();
-</script>
 <script>
 // ────────────────────────────────────────────
 // State
@@ -973,7 +253,7 @@ function syncActions(){
 // ────────────────────────────────────────────
 function buildThumb(file, onclick){
   const wrap = document.createElement("div");
-  wrap.className = "thumb q-thumb";
+  wrap.className = "q-thumb";
   wrap.title = "ចុចដើម្បីព្យាបាលជាបណ្ដោះអាសន្ន";
   wrap.style.cursor = "pointer";
   const cat = mimeCategory(file);
@@ -982,7 +262,7 @@ function buildThumb(file, onclick){
     const img = document.createElement("img");
     img.src = URL.createObjectURL(file);
     img.alt = file.name;
-    img.className = "media"; wrap.appendChild(img);
+    wrap.appendChild(img);
     wrap.addEventListener("click", onclick);
   } else if(cat === "video"){
     const vid = document.createElement("video");
@@ -990,10 +270,10 @@ function buildThumb(file, onclick){
     vid.muted = true;
     vid.preload = "metadata";
     vid.addEventListener("loadedmetadata",()=>{vid.currentTime=1});
-    vid.className = "media"; wrap.appendChild(vid);
+    wrap.appendChild(vid);
     const play = document.createElement("span");
-    play.className = "play-hit always";
-    play.innerHTML = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>';
+    play.className = "media-play";
+    play.textContent = "▶";
     wrap.appendChild(play);
     wrap.addEventListener("click", onclick);
   } else if(cat === "audio"){
@@ -1030,7 +310,7 @@ function openPreview(file){
   } else {
     // No visual preview – just show info
     const info = document.createElement("div");
-    info.style.cssText="padding:40px;text-align:center;color:var(--ink-dim)";
+    info.style.cssText="padding:40px;text-align:center;color:#8898bb";
     info.innerHTML=`<div style="font-size:52px;margin-bottom:14px">${fileIcon(file)}</div>
       <div style="font-weight:700;font-size:15px;margin-bottom:6px">${file.name}</div>
       <div style="font-size:12px">${fmtSize(file.size)}</div>`;
@@ -1102,7 +382,7 @@ function renderQueueItem(entry){
   const {id, file} = entry;
 
   const item = document.createElement("div");
-  item.className = "card in file-card q-item";
+  item.className = "q-item";
   item.dataset.id = id;
   item.dataset.genre = categoryFromName(file.name, file.type);
   entry.itemEl = item;
@@ -1113,7 +393,7 @@ function renderQueueItem(entry){
 
   // Info column
   const info = document.createElement("div");
-  info.className = "q-info card-body";
+  info.className = "q-info";
 
   const name = document.createElement("input");
   name.className = "q-name-input";
@@ -1137,7 +417,7 @@ function renderQueueItem(entry){
   entry.urlEl = urlEl;
 
   const copyBtn = document.createElement("button");
-  copyBtn.className = "q-copy mini-btn";
+  copyBtn.className = "q-copy";
   copyBtn.textContent = "Copy URL";
   copyBtn.addEventListener("click", async (e)=>{
     e.stopPropagation();
@@ -1327,25 +607,15 @@ function setStatus(entry, status, errMsg=""){
 function renderCloudCard(file){
   const category = categoryFromName(file.name);
   const safeName = escapeHtml(file.name);
-  const url = escapeHtml(file.url);
-  const label = {image:"IMAGE",video:"VIDEO",audio:"MUSIC",other:"FILE"}[category];
-  const visual = category === "image"
-    ? `<img class="media" src="${url}" alt="${safeName}" loading="lazy">`
+  let visual = category === "image"
+    ? `<img src="${file.url}" alt="${safeName}" loading="lazy">`
     : category === "video"
-      ? `<video class="media" src="${url}" muted preload="metadata"></video><span class="play-hit always"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></span>`
+      ? `<video src="${file.url}" muted preload="metadata"></video><span class="media-play">▶</span>`
       : category === "audio" ? waveformHtml() : `<div class="cloud-icon">📄</div>`;
-  const copyIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h9"/></svg>';
-  return `<article class="card in file-card cloud-item" data-key="${encodeURIComponent(file.key)}" data-genre="${category}" data-preview-url="${url}" data-preview-category="${category}" data-preview-name="${safeName}">
-    <div class="thumb cloud-visual">${visual}<div class="vign"></div><span class="badge-size">${label}</span><button class="fab cloud-copy-fab" data-copy-url="${url}" title="Copy URL" aria-label="Copy URL">${copyIcon}</button></div>
-    <div class="card-body">
-      <h3 class="cloud-name" title="${safeName}">${safeName}</h3>
-      <p class="cloud-meta">${fmtSize(file.size || 0)} · ${new Date(file.lastModified).toLocaleString()}</p>
-      <div class="card-foot"><a class="mini-btn cloud-open" href="${url}" target="_blank" rel="noopener">Open</a><button class="mini-btn danger cloud-delete" data-delete-key="${encodeURIComponent(file.key)}">Delete</button></div>
-    </div>
-  </article>`;
+  return `<article class="cloud-item" data-key="${encodeURIComponent(file.key)}" data-genre="${category}" data-preview-url="${escapeHtml(file.url)}" data-preview-category="${category}" data-preview-name="${safeName}"><button class="cloud-copy-fab" data-copy-url="${escapeHtml(file.url)}" title="Copy URL" aria-label="Copy URL">⧉</button><div class="cloud-visual">${visual}</div><div class="cloud-info"><div class="cloud-name" title="${safeName}">${safeName}</div><div class="cloud-meta">${fmtSize(file.size || 0)} · ${new Date(file.lastModified).toLocaleString()}</div></div><div class="cloud-actions"><a class="cloud-open" href="${file.url}" target="_blank" rel="noopener">Open</a><button class="cloud-delete" data-delete-key="${encodeURIComponent(file.key)}">Delete</button></div></article>`;
 }
 async function copyUrl(url, button){
-  try{await navigator.clipboard.writeText(url);const old=button.innerHTML;button.textContent="✓";setTimeout(()=>button.innerHTML=old,1400)}
+  try{await navigator.clipboard.writeText(url);const old=button.textContent;button.textContent="✓ Copied";setTimeout(()=>button.textContent=old,1400)}
   catch{showError("មិនអាច Copy URL បានទេ")}
 }
 function applyGenreFilter(){
@@ -1367,7 +637,7 @@ async function loadCloudFiles(){
     if(!data.files.length){list.innerHTML='<div class="cloud-empty">មិនទាន់មានឯកសារនៅក្នុង R2 ទេ</div>';return;}
     list.innerHTML = data.files.map(renderCloudCard).join("");
     list.querySelectorAll("[data-delete-key]").forEach(button=>button.addEventListener("click",()=>deleteCloudFile(decodeURIComponent(button.dataset.deleteKey),button)));
-    list.querySelectorAll("[data-copy-url]").forEach(button=>button.addEventListener("click",e=>{e.stopPropagation();copyUrl(button.dataset.copyUrl,button)}));
+    list.querySelectorAll("[data-copy-url]").forEach(button=>button.addEventListener("click",()=>copyUrl(button.dataset.copyUrl,button)));
     list.querySelectorAll(".cloud-visual").forEach(visual=>visual.addEventListener("click",()=>{
       const card = visual.closest(".cloud-item");
       openRemotePreview(card.dataset.previewUrl, card.dataset.previewCategory, card.dataset.previewName);
@@ -1419,5 +689,6 @@ function putToR2(url, file, entry){
   });
 }
 </script>
+
 </body>
 </html>
